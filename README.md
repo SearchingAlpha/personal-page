@@ -36,9 +36,10 @@ La portada es una lámina de cuaderno de laboratorio. **La figura es un átomo: 
 - **El pie de figura se fecha solo:** "Observed Sep 2026" es la fecha de la build. La build es la observación.
 - **Quietud:** con `prefers-reduced-motion` los electrones descansan en su `phase`. Sin soporte de motion paths, se colocan en la posición precalculada. Ambos casos dan la misma imagen que el instante inicial.
 - **Geometría con una sola fuente de verdad:** `RX`/`RY` en `src/lib/rutherford.ts` alimentan el anillo, el motion path y la posición estática, así el electrón está siempre exactamente sobre la línea.
-- **Se adapta al tamaño del átomo, no del viewport** (container queries): bajo 480 px desaparece la línea de rol del núcleo (el pie la conserva); bajo 420 px las etiquetas flotan sobre su punto en vez de apuntar hacia dentro, donde chocarían con el nombre.
-- **Modo oscuro** automático vía `prefers-color-scheme`. Todos los colores y ritmos están en `:root` al principio de `src/styles/rutherford.css`.
-- **Tipografía:** Instrument Serif para el nombre, títulos y cursivas; IBM Plex Mono para todas las anotaciones; Inter para el cuerpo.
+- **Las etiquetas flotan sobre su punto y el *peek* cae debajo**, nunca hacia los lados: así ningún electrón alcanza jamás el marco del núcleo, a ningún tamaño.
+- **Se adapta al tamaño del átomo, no del viewport** (container queries): bajo 480 px desaparece la línea de rol del núcleo (el pie la conserva); bajo 420 px desaparece el *peek*, porque no hay hover que lo revele ni sitio para él.
+- **Estilo: `skills/design4` (Atlantic)** — observatorio de medianoche en wireframe. Solo oscuro: lienzo negro, lámina en carbón, tipo blanco hielo que es también el color de todas las líneas ("un wireframe dibujado con luz"). Sin sombras ni degradados: la profundidad es escalonado de superficies. El **cobalto eléctrico** solo resalta — las partículas de los electrones, los puntos azules en las esquinas de cada marco, el asterisco junto a los títulos, la segunda palabra del nombre. El **naranja señal** solo para estados interactivos — hover, foco, la etiqueta *Building*. Por eso el halo del núcleo es ahora un marco plano con esquinas azules en vez de un degradado: mismo efecto de profundidad, sin romper la regla. Todos los colores están en `:root` al principio de `src/styles/rutherford.css`.
+- **Tipografía:** una sola sans a un solo peso — Inter 400 (sustituto de Monument), con `-0.03em` en el nombre; la jerarquía la lleva el tamaño, nunca la negrita. JetBrains Mono a 10 px con tracking 0.16em para todas las anotaciones.
 
 ### Páginas de tópico
 

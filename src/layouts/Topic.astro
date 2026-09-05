@@ -34,7 +34,10 @@ const year = new Date().getFullYear();
       </a>
       <div>
         <p class="topic__index">Electron {electronIndex(electron)} / {total}</p>
-        <h1 class="topic__title">{electron.label}</h1>
+        <div class="topic__title-row">
+          <span class="sparkle" aria-hidden="true"><i></i></span>
+          <h1 class="topic__title">{electron.label}</h1>
+        </div>
       </div>
     </header>
 

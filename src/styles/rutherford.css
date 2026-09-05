@@ -1,5 +1,6 @@
 /* ─────────────────────────────────────────────────────────────────────────────
    Rutherford — the site as a plate from a lab notebook.
+   Styled after skills/design4 (Atlantic): a midnight observatory wireframe.
 
    The figure is an atom. The nucleus is a name; each topic is an electron on
    a tilted elliptical orbit, moving for real: CSS motion paths, no JavaScript.
@@ -8,57 +9,73 @@
    solid. The margins of the plate carry the annotations: caption, index, a
    dated "now" line, links.
 
-   Retheming: every colour, rhythm and duration is a custom property in :root.
+   Design4 rules honoured here:
+   - Dark only. Surfaces step through charcoals; no shadows, no gradients.
+     Depth is surface stepping and 1px ice-white wireframe lines.
+   - Ice white is both the type and the border colour.
+   - Electric cobalt only highlights: the electron particles, corner dots on
+     frames, the sparkle mark, one word in a headline.
+   - Signal orange only for interactive states: hover, focus, the live tag.
+   - One sans at a single weight (400). Size carries the hierarchy.
+   - Mono micro-labels, uppercase, 0.16em tracking.
+
    Geometry (--rx, --ry) is set inline from src/lib/rutherford.ts so the ring,
    the motion path and the static fallback can never disagree.
    ───────────────────────────────────────────────────────────────────────────── */
 
 :root {
-  --bg: #fbfaf8;
-  --ink: #14130f;
-  --ink-soft: #45423b;
-  --muted: #78746a;
-  --rule: #d9d4ca;
-  --rule-strong: #bfb8aa;
-  --accent: #1c6b58;
-  --accent-soft: #e8f0ec;
+  /* Design4 palette */
+  --void: #000000;
+  --carbon: #0d0d0f;
+  --graphite: #232529;
+  --slate: #2b2f33;
+  --ice: #d8eaff;
+  --fog: #6c757f;
+  --steel: #565e66;
+  --cobalt: #1f58f2;
+  --signal: #ff4105;
+
+  /* Roles */
+  --bg: var(--carbon); /* plate surface; the page canvas beneath is void */
+  --ink: var(--ice);
+  --ink-soft: rgba(216, 234, 255, 0.72);
+  --muted: var(--fog);
+  --hair: rgba(216, 234, 255, 0.2); /* rings, dividers, leaders */
+  --wire: rgba(216, 234, 255, 0.42); /* frames */
+  --accent: var(--cobalt); /* highlight, never interactive */
+  --active: var(--signal); /* interactive, never decorative */
 
   --frame: clamp(14px, 3vw, 32px);
+  /* Design4's bordered container: 8px radius, so corner dots sit on the corner. */
+  --radius-frame: 8px;
+  --radius-tag: 8px;
 
-  --display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
-  --sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --dur: 220ms;
   --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0e0e0c;
-    --ink: #efece4;
-    --ink-soft: #c4bfb4;
-    --muted: #8d887d;
-    --rule: #2c2b26;
-    --rule-strong: #46433b;
-    --accent: #57b89a;
-    --accent-soft: #16221d;
-  }
-}
-
 body.rutherford {
-  background: var(--bg);
+  color-scheme: dark;
+  background: var(--void);
   color: var(--ink);
   font-family: var(--sans);
-  font-size: 15px;
-  line-height: 1.6;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.5;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
 }
 
-/* Small mono annotation register, used all over the plate. */
-.mono,
+/* Single-weight discipline: nothing on the page is bolder than 400. */
+body.rutherford :is(h1, h2, h3, strong, b) {
+  font-weight: 400;
+}
+
+/* Mono micro-label register, used all over the plate. */
 .plate__head,
 .plate__links,
 .legend,
@@ -72,10 +89,46 @@ body.rutherford {
 .pill,
 .links__handle,
 .electron__label,
-.electron__count {
+.electron__count,
+.nucleus__role {
   font-family: var(--mono);
-  letter-spacing: 0.12em;
+  font-size: 10px;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
+}
+
+/* Blue dots marking the corners of a frame — the design4 container motif.
+   Markup: <span class="corners"><i/><i/><i/><i/></span> inside any
+   position:relative box. */
+.corners {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.corners i {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.corners i:nth-child(1) {
+  left: -3px;
+  top: -3px;
+}
+.corners i:nth-child(2) {
+  right: -3px;
+  top: -3px;
+}
+.corners i:nth-child(3) {
+  left: -3px;
+  bottom: -3px;
+}
+.corners i:nth-child(4) {
+  right: -3px;
+  bottom: -3px;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -83,9 +136,12 @@ body.rutherford {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .plate {
+  position: relative;
   flex: 1;
   margin: var(--frame);
-  border: 1px solid var(--rule);
+  border: 1px solid var(--wire);
+  border-radius: var(--radius-frame);
+  background: var(--bg);
   padding: clamp(16px, 2.5vw, 28px) clamp(18px, 3vw, 36px);
   display: grid;
   grid-template-rows: auto 1fr auto;
@@ -98,7 +154,6 @@ body.rutherford {
   justify-content: space-between;
   align-items: baseline;
   gap: 16px;
-  font-size: 11px;
   color: var(--muted);
 }
 
@@ -126,10 +181,10 @@ body.rutherford {
 
 .figure__cap {
   margin: 0;
-  font-size: 10.5px;
   color: var(--muted);
   text-align: center;
   text-wrap: balance;
+  line-height: 1.6;
 }
 
 .atom {
@@ -140,8 +195,8 @@ body.rutherford {
 }
 
 /* ── Rings ─────────────────────────────────────────────────────────────────
-   A border-radius:50% box is a true ellipse. Each ring is tilted by its
-   orbit's --tilt and sits under everything else. */
+   A border-radius:50% box is a true ellipse, drawn as a hairline in ice
+   white. Each ring is tilted by its orbit's --tilt and sits under everything. */
 
 .ring {
   position: absolute;
@@ -149,7 +204,7 @@ body.rutherford {
   top: calc(50% - var(--ry));
   width: calc(var(--rx) * 2);
   height: calc(var(--ry) * 2);
-  border: 1px solid var(--rule);
+  border: 1px solid var(--hair);
   border-radius: 50%;
   rotate: var(--tilt);
   z-index: 0;
@@ -157,20 +212,21 @@ body.rutherford {
   transition: border-color var(--dur) var(--ease);
 }
 
-/* Holding an electron lights up the orbit it rides. One rule per orbit index;
-   add a line if you ever have more than four orbits. */
+/* Holding an electron switches on the orbit it rides. One rule per orbit
+   index; add a line if you ever have more than four orbits. */
 .atom:has(.lane[data-orbit='0'] .electron:hover) .ring[data-orbit='0'],
 .atom:has(.lane[data-orbit='1'] .electron:hover) .ring[data-orbit='1'],
 .atom:has(.lane[data-orbit='2'] .electron:hover) .ring[data-orbit='2'],
 .atom:has(.lane[data-orbit='3'] .electron:hover) .ring[data-orbit='3'] {
-  border-color: var(--accent);
+  border-color: var(--active);
 }
 
 /* ── Nucleus ───────────────────────────────────────────────────────────────
-   The name, and one quiet line under it. The soft halo behind fades the
-   rings as they approach and hides electrons on the "behind" half of their
-   orbit — that is the depth cue. Kept tight so it never reaches the ends of
-   the major axis. */
+   The name inside a wireframe frame with cobalt corner dots — design4's
+   "bordered container": a viewport you look into. Its flat surface is what
+   hides rings and electrons on the "behind" half of their orbit; that is the
+   depth cue, done with surface stepping instead of a gradient. Capped in atom
+   units so a long name can never reach the ends of the major axis (38cqw). */
 
 .nucleus {
   position: absolute;
@@ -178,42 +234,38 @@ body.rutherford {
   top: 50%;
   translate: -50% -50%;
   z-index: 2;
-  padding: 0.3em 0.45em;
+  max-width: 62cqw;
+  padding: 0.34em 0.38em 0.4em;
+  border: 1px solid var(--wire);
+  border-radius: var(--radius-tag);
+  background: var(--bg);
   font-size: clamp(26px, 9cqw, 84px);
   text-align: center;
-  white-space: nowrap;
-}
-
-/* Grows with the text but is capped in atom units, so a long name or role line
-   can never push the halo out to the ends of the major axis (at 38cqw). */
-.nucleus::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  left: 50%;
-  top: 50%;
-  translate: -50% -50%;
-  width: min(calc(100% + 24%), 62cqw);
-  height: calc(100% + 50%);
-  background: radial-gradient(closest-side, var(--bg) 58%, transparent);
 }
 
 .nucleus__name {
   margin: 0;
-  font-family: var(--display);
-  font-weight: 400;
   font-size: 1em;
   line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
+  font-feature-settings: 'ss01', 'ss02';
+  white-space: nowrap;
 }
 
+/* One accent word inside a neutral headline: the second word of a name. */
+.hl {
+  color: var(--accent);
+}
+
+/* The name sets the frame's width; the role wraps beneath it rather than
+   stretching the frame out toward the tags at the orbit ends. */
 .nucleus__role {
-  margin: 0.4em 0 0;
-  font-family: var(--mono);
-  font-size: clamp(8.5px, 1.35cqw, 11px);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  margin: 0.4em auto 0;
+  max-width: min(100%, 24ch);
+  font-size: clamp(8.5px, 1.3cqw, 10px);
+  line-height: 1.6;
   color: var(--muted);
+  text-wrap: balance;
 }
 
 /* ── Electrons ─────────────────────────────────────────────────────────────
@@ -222,9 +274,9 @@ body.rutherford {
      .lane           full-size box rotated by --tilt; carries z-index
        a.electron    44px touch target moving along the ellipse
          .body       counter-rotated so the tag stays upright; depth scale
-           .dot      sits exactly on the path
-           .tag      label + count; knocks out the ring line behind it
-             .peek   the freshest item, revealed while held
+           .dot      a cobalt particle, exactly on the path
+           .tag      label + count, above the dot; knocks out the ring line
+           .peek     the freshest item, below the dot, revealed while held
 
    Three animations, identical timing, so they stay in phase:
    `orbit` moves the electron, `depth` flips the lane's z-index halfway round,
@@ -261,7 +313,7 @@ body.rutherford {
 }
 
 .electron:focus-visible {
-  outline: 1px solid var(--accent);
+  outline: 1px solid var(--active);
   outline-offset: 2px;
 }
 
@@ -280,54 +332,50 @@ body.rutherford {
   position: absolute;
   left: 0;
   top: 0;
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   translate: -50% -50%;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 0 3px var(--bg);
-  transition: scale var(--dur) var(--ease);
+  outline: 3px solid var(--bg);
+  transition: scale var(--dur) var(--ease), background var(--dur) var(--ease);
 }
 
-/* The tag hangs off the dot to the right, centred on it. The peek is taken out
-   of flow so the tag's knockout stays exactly label-sized. */
+/* The tag floats centred above its dot, the peek centred below it. Neither
+   reaches sideways, so nothing ever runs into the nucleus frame, and the
+   knockouts stay exactly text-sized. */
 .electron__tag {
-  --line: 15px;
   position: absolute;
-  left: 11px;
-  top: calc(-0.5 * var(--line) - 3px);
+  left: 0;
+  bottom: 9px;
+  translate: -50% 0;
   padding: 3px 7px;
   background: var(--bg);
   white-space: nowrap;
-  line-height: var(--line);
+  line-height: 14px;
   color: var(--ink);
   transition: color var(--dur) var(--ease);
 }
 
-.electron__label {
-  font-size: 10.5px;
-  font-weight: 500;
-}
-
 .electron__count {
   margin-left: 8px;
-  font-size: 10.5px;
   color: var(--muted);
 }
 
 .electron__peek {
   position: absolute;
   left: 0;
-  top: 100%;
-  padding: 1px 7px 4px;
+  top: 9px;
+  translate: -50% -4px;
+  padding: 2px 7px 3px;
   background: var(--bg);
-  font-family: var(--display);
-  font-style: italic;
-  font-size: 13.5px;
-  line-height: 1.3;
-  color: var(--ink-soft);
+  font-size: 12.5px;
+  line-height: 1.4;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+  color: var(--muted);
   opacity: 0;
-  translate: 0 -4px;
   visibility: hidden;
   transition: opacity var(--dur) var(--ease), translate var(--dur) var(--ease),
     visibility 0s var(--dur);
@@ -335,18 +383,19 @@ body.rutherford {
 
 .electron:hover .electron__tag,
 .electron:focus-visible .electron__tag {
-  color: var(--accent);
+  color: var(--active);
 }
 
 .electron:hover .electron__dot,
 .electron:focus-visible .electron__dot {
+  background: var(--active);
   scale: 1.5;
 }
 
 .electron:hover .electron__peek,
 .electron:focus-visible .electron__peek {
   opacity: 1;
-  translate: 0 0;
+  translate: -50% 0;
   visibility: visible;
   transition-delay: 0s;
 }
@@ -396,9 +445,8 @@ body.rutherford {
 /* ── Small atoms ───────────────────────────────────────────────────────────
    Container queries against .atom, so these follow the figure's size rather
    than the viewport's. Below 480px the role line no longer fits under the
-   name (the caption carries it). Below 420px the tags float above their dot
-   instead of reaching inward, where they would collide with the nucleus; the
-   peek goes too, since there is no hover to reveal it. */
+   name (the caption carries it). Below 420px the peek goes: there is no hover
+   to reveal it, and no room for it. */
 
 @container (max-width: 480px) {
   .nucleus__role {
@@ -407,12 +455,6 @@ body.rutherford {
 }
 
 @container (max-width: 420px) {
-  .electron__tag {
-    left: 0;
-    top: auto;
-    bottom: 8px;
-    translate: -50% 0;
-  }
   .electron__peek {
     display: none;
   }
@@ -454,7 +496,7 @@ body.rutherford {
   align-items: end;
   gap: clamp(20px, 4vw, 48px);
   padding-top: 14px;
-  border-top: 1px solid var(--rule);
+  border-top: 1px solid var(--hair);
 }
 
 /* Index: a numbered legend of the electrons, with dotted leaders. Doubles as
@@ -465,8 +507,7 @@ body.rutherford {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  font-size: 10.5px;
+  gap: 7px;
 }
 
 .legend a {
@@ -479,42 +520,38 @@ body.rutherford {
 }
 
 .legend a:hover {
-  color: var(--accent);
+  color: var(--active);
 }
 
-.legend__i {
+.legend__i,
+.legend__n {
   color: var(--muted);
 }
 
 .legend__leader {
   flex: 1;
-  border-bottom: 1px dotted var(--rule-strong);
+  border-bottom: 1px dotted var(--hair);
   translate: 0 -3px;
 }
 
-.legend__n {
-  color: var(--muted);
-}
-
-/* Now: the closest thing the plate has to a thesis, dated. */
+/* Now: the closest thing the plate has to a thesis, dated. Set as design4's
+   editorial statement — the sans, muted, roomy line-height. */
 .now {
   text-align: center;
 }
 
 .now__eyebrow {
-  margin: 0 0 6px;
-  font-size: 10px;
+  margin: 0 0 8px;
   color: var(--muted);
 }
 
 .now__text {
   width: fit-content;
-  max-width: 36ch;
+  max-width: 40ch;
   margin: 0 auto;
-  font-family: var(--display);
-  font-style: italic;
-  font-size: clamp(16px, 1.6vw, 19px);
-  line-height: 1.4;
+  font-size: clamp(14px, 1.3vw, 16px);
+  line-height: 1.7;
+  letter-spacing: -0.01em;
   color: var(--ink-soft);
   text-wrap: pretty;
 }
@@ -522,7 +559,6 @@ body.rutherford {
 .now__stamp {
   width: fit-content;
   margin: 8px auto 0;
-  font-size: 10px;
   color: var(--muted);
 }
 
@@ -534,7 +570,6 @@ body.rutherford {
   justify-content: flex-end;
   flex-wrap: wrap;
   gap: 6px 18px;
-  font-size: 10.5px;
 }
 
 .plate__links a {
@@ -544,7 +579,7 @@ body.rutherford {
 }
 
 .plate__links a:hover {
-  color: var(--accent);
+  color: var(--active);
 }
 
 @media (max-width: 760px) {
@@ -607,14 +642,13 @@ body.rutherford {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font-size: 11px;
   color: var(--muted);
   text-decoration: none;
   transition: color var(--dur) var(--ease);
 }
 
 .topic__back:hover {
-  color: var(--accent);
+  color: var(--active);
 }
 
 /* A 16px atom: dot plus one tilted ring. The way back to the nucleus. */
@@ -634,7 +668,7 @@ body.rutherford {
   height: 4px;
   translate: -50% -50%;
   border-radius: 50%;
-  background: currentColor;
+  background: var(--accent);
 }
 
 .mark::after {
@@ -650,18 +684,53 @@ body.rutherford {
 }
 
 .topic__index {
-  margin: 0 0 10px;
-  font-size: 10.5px;
+  margin: 0 0 12px;
   color: var(--muted);
+}
+
+/* Design4's sparkle: a six-point asterisk in cobalt, hand-drawn tilt, to the
+   left of a section headline. Three bars — the <i> and two pseudo-elements. */
+.topic__title-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.sparkle {
+  position: relative;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  rotate: -8deg;
+}
+
+.sparkle i,
+.sparkle::before,
+.sparkle::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 1.5px;
+  height: 100%;
+  translate: -50% 0;
+  background: var(--accent);
+}
+
+.sparkle::before {
+  rotate: 60deg;
+}
+
+.sparkle::after {
+  rotate: 120deg;
 }
 
 .topic__title {
   margin: 0;
-  font-family: var(--display);
-  font-weight: 400;
-  font-size: clamp(40px, 8vw, 72px);
-  line-height: 0.95;
-  letter-spacing: -0.02em;
+  font-size: clamp(40px, 7vw, 64px);
+  line-height: 1.06;
+  letter-spacing: -0.01em;
+  font-feature-settings: 'ss01', 'ss02';
   text-wrap: balance;
 }
 
@@ -675,8 +744,7 @@ body.rutherford {
   align-items: baseline;
   gap: 16px;
   padding-top: 18px;
-  border-top: 1px solid var(--rule);
-  font-size: 10.5px;
+  border-top: 1px solid var(--hair);
   color: var(--muted);
 }
 
@@ -687,7 +755,7 @@ body.rutherford {
 }
 
 .topic__foot a:hover {
-  color: var(--accent);
+  color: var(--active);
 }
 
 /* ── Lists ─────────────────────────────────────────────────────────────── */
@@ -699,7 +767,7 @@ body.rutherford {
 }
 
 .rows > li + li {
-  border-top: 1px solid var(--rule);
+  border-top: 1px solid var(--hair);
 }
 
 .row {
@@ -721,46 +789,42 @@ body.rutherford {
 
 .row__title {
   font-size: 17px;
-  font-weight: 500;
-  letter-spacing: -0.005em;
+  letter-spacing: -0.01em;
   transition: color var(--dur) var(--ease);
 }
 
 a.row:hover .row__title {
-  color: var(--accent);
+  color: var(--active);
 }
 
 .row__meta {
   margin-left: auto;
   flex-shrink: 0;
-  font-size: 10.5px;
   color: var(--muted);
 }
 
 .row__blurb {
   margin: 6px 0 0;
-  font-size: 14.5px;
   line-height: 1.6;
-  color: var(--ink-soft);
+  color: var(--muted);
   text-wrap: pretty;
 }
 
+/* Outlined tag — never filled. The live one is the single warm accent. */
 .pill {
-  font-size: 9.5px;
-  padding: 2px 6px;
-  border: 1px solid var(--rule-strong);
-  border-radius: 2px;
+  padding: 2px 7px;
+  border: 1px solid var(--wire);
+  border-radius: var(--radius-tag);
   color: var(--muted);
   white-space: nowrap;
 }
 
 .pill--live {
-  color: var(--accent);
-  border-color: var(--accent);
-  background: var(--accent-soft);
+  color: var(--active);
+  border-color: var(--active);
 }
 
-/* Numbered principles. */
+/* Numbered principles, at heading-sm. */
 .creed {
   list-style: none;
   margin: 0;
@@ -768,7 +832,7 @@ a.row:hover .row__title {
   counter-reset: creed;
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 24px;
 }
 
 .creed li {
@@ -776,9 +840,9 @@ a.row:hover .row__title {
   display: grid;
   grid-template-columns: 32px 1fr;
   gap: 12px;
-  font-family: var(--display);
-  font-size: clamp(20px, 2.6vw, 26px);
-  line-height: 1.35;
+  font-size: clamp(19px, 2.4vw, 24px);
+  line-height: 1.24;
+  letter-spacing: -0.01em;
   color: var(--ink-soft);
   text-wrap: pretty;
 }
@@ -786,10 +850,10 @@ a.row:hover .row__title {
 .creed li::before {
   content: counter(creed, decimal-leading-zero);
   font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.1em;
+  font-size: 10px;
+  letter-spacing: 0.16em;
   color: var(--muted);
-  padding-top: 0.55em;
+  padding-top: 0.5em;
 }
 
 /* Outbound links. */
@@ -800,7 +864,7 @@ a.row:hover .row__title {
 }
 
 .links > li + li {
-  border-top: 1px solid var(--rule);
+  border-top: 1px solid var(--hair);
 }
 
 .links a {
@@ -818,35 +882,36 @@ a.row:hover .row__title {
 }
 
 .links a:hover {
-  color: var(--accent);
+  color: var(--active);
 }
 
 .links__label {
   font-size: 16px;
-  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 .links__handle {
   margin-left: auto;
-  font-size: 12px;
+  font-size: 11px;
   text-transform: none;
-  letter-spacing: 0;
+  letter-spacing: 0.02em;
   color: var(--muted);
   transition: color var(--dur) var(--ease);
 }
 
 .links a:hover .links__handle {
-  color: var(--accent);
+  color: var(--active);
 }
 
 /* ── Placeholder marker ────────────────────────────────────────────────────
    Anything still carrying `TODO —` is outlined so it cannot ship by accident.
+   Deliberately outside the palette so it reads as scaffolding, not design.
    Delete this rule once the content is real. */
 
 .is-todo {
-  outline: 1px dashed #c2410c;
+  outline: 1px dashed #ffd166;
   outline-offset: 4px;
-  background: rgba(194, 65, 12, 0.06);
+  background: rgba(255, 209, 102, 0.06);
 }
 
 @media (prefers-reduced-motion: reduce) {

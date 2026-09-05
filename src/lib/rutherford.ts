@@ -1,8 +1,10 @@
 import type { Electron, Orbit } from '../data/atom';
 
-// Google Fonts for the Rutherford design. Shared by the atom and topic pages.
+// Google Fonts for the Rutherford design, shared by the atom and topic pages.
+// Design4 substitutes: Inter for Monument, JetBrains Mono for Mono — both at a
+// single weight, as the reference demands.
 export const FONT_LINKS = [
-  'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&display=swap',
+  'https://fonts.googleapis.com/css2?family=Inter:wght@400&family=JetBrains+Mono:wght@400&display=swap',
 ];
 
 // Orbit geometry as a percentage of the (square) atom box. The ring, the

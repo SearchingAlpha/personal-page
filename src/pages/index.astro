@@ -34,6 +34,10 @@ const pad = (n: number) => String(n).padStart(2, '0');
 // The build is the observation.
 const observed = new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 const year = new Date().getFullYear();
+
+// Design4 highlights one word inside a neutral headline. For a name, that is
+// everything after the first word — nothing, when the name is a single word.
+const [nameFirst, ...nameRest] = profile.name.split(' ');
 ---
 
 <Layout
@@ -43,6 +47,8 @@ const year = new Date().getFullYear();
   fontLinks={FONT_LINKS}
 >
   <div class="plate">
+    <span class="corners" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+
     <header class="plate__head">
       <span class="plate__wordmark">{profile.name}</span>
       <span class="plate__meta">{profile.location} · {year}</span>
@@ -58,7 +64,10 @@ const year = new Date().getFullYear();
           }
 
           <div class="nucleus">
-            <h1 class="nucleus__name">{profile.name}</h1>
+            <span class="corners" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            <h1 class="nucleus__name">
+              {nameFirst}{nameRest.length > 0 && <span class="hl"> {nameRest.join(' ')}</span>}
+            </h1>
             <p class="nucleus__role">{profile.role}</p>
           </div>
 
@@ -74,8 +83,8 @@ const year = new Date().getFullYear();
                         <span class="electron__tag">
                           <span class="electron__label">{e.label}</span>
                           <span class="electron__count">{pad(f.count)}</span>
-                          {f.peek && <span class={`electron__peek ${todoClass(f.peek)}`}>{f.peek}</span>}
                         </span>
+                        {f.peek && <span class={`electron__peek ${todoClass(f.peek)}`}>{f.peek}</span>}
                       </span>
                     </a>
                   </div>
