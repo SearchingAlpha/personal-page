@@ -147,17 +147,24 @@ const [nameFirst, ...nameRest] = profile.name.split(' ');
   // ── The field ──────────────────────────────────────────────────────────────
   // A cellular automaton behind the plate: von Neumann's idea, Conway's rule.
   // Cells sit on a lattice of faint dots; live ones glow cobalt and ease in
-  // and out rather than blink. The figure sits in a clearing. Moving the
-  // pointer disturbs the vacuum and births cells. This is the only script on
-  // the site, and the page is complete without it.
+  // and out rather than blink. The figure sits in a clearing.
+  //
+  // The field senses the pointer: the lattice warms around it, trailing a
+  // wake that cools; cells are born along its path; a click drops a glider.
+  // This is the only script on the site, and the page is complete without it.
 
   const PITCH = 15; // px between lattice points
   const DENSITY = 0.2; // initial live fraction
   const STEP_MS = 560; // one generation
   const EASE = 0.14; // glow easing per frame
   const FLOOR = 0.11; // live fraction below which the vacuum fluctuates
+  const REACH = 7; // cells: radius the pointer warms
+  const COOL = 0.975; // heat kept per frame; half-life ≈ 0.45s, wake ≈ 1.5s
   const COBALT = '31,88,242';
   const ICE = '216,234,255';
+
+  // A glider, the smallest thing in Life that goes somewhere.
+  const GLIDER: [number, number][] = [[1, 0], [2, 1], [0, 2], [1, 2], [2, 2]];
 
   const canvas = document.querySelector<HTMLCanvasElement>('.field');
   const plate = canvas?.closest<HTMLElement>('.plate');
@@ -181,12 +188,16 @@ const [nameFirst, ...nameRest] = profile.name.split(' ');
     let next = new Uint8Array(0);
     let glow = new Float32Array(0);
     let fall = new Float32Array(0); // 0 inside the clearing → 1 at full density
+    let heat = new Float32Array(0); // pointer warmth, 0–1, cooling each frame
+    let cursor: { x: number; y: number } | null = null; // in cell units
     let lattice: HTMLCanvasElement | null = null;
     let dirty = true;
 
     // Quantised fill styles, so the draw loop allocates no strings.
+    // Life is cobalt; the pointer's warmth is ice white, so the two read apart.
     const LEVELS = 16;
     const live = Array.from({ length: LEVELS + 1 }, (_, i) => `rgba(${COBALT},${(0.3 + 0.7 * (i / LEVELS)).toFixed(3)})`);
+    const warmth = Array.from({ length: LEVELS + 1 }, (_, i) => `rgba(${ICE},${(0.1 + 0.75 * (i / LEVELS)).toFixed(3)})`);
 
     function setup() {
       const r = plate.getBoundingClientRect();
@@ -204,6 +215,7 @@ const [nameFirst, ...nameRest] = profile.name.split(' ');
       next = new Uint8Array(n);
       glow = new Float32Array(n);
       fall = new Float32Array(n);
+      heat = new Float32Array(n);
 
       // The clearing: nothing inside the orbits, full field just beyond them.
       const a = atom.getBoundingClientRect();
@@ -289,16 +301,47 @@ const [nameFirst, ...nameRest] = profile.name.split(' ');
         for (let x = 0; x < cols; x++) {
           const k = y * cols + x;
           const g = glow[k] * fall[k];
-          if (g < 0.03) continue;
-          ctx.fillStyle = live[Math.round(g * LEVELS)];
-          const s = 1.6 + 1.8 * g;
-          ctx.fillRect(x * PITCH + PITCH / 2 - s / 2, y * PITCH + PITCH / 2 - s / 2, s, s);
+          const hz = heat[k] * fall[k];
+          const px = x * PITCH + PITCH / 2;
+          const py = y * PITCH + PITCH / 2;
+          // Warmth lights the lattice itself, in ice, wherever Life is not.
+          if (hz > 0.03 && g < 0.5) {
+            ctx.fillStyle = warmth[Math.round(hz * LEVELS)];
+            const s = 1.4 + 2.2 * hz;
+            ctx.fillRect(px - s / 2, py - s / 2, s, s);
+          }
+          // Life glows cobalt; warmth saturates it.
+          if (g >= 0.03) {
+            const v = Math.min(1, g + hz * 0.5);
+            ctx.fillStyle = live[Math.round(v * LEVELS)];
+            const s = 1.6 + 1.8 * v;
+            ctx.fillRect(px - s / 2, py - s / 2, s, s);
+          }
+        }
+      }
+    }
+
+    /** Warm the lattice under the pointer: a smooth bump, REACH cells wide. */
+    function warm() {
+      if (!cursor) return;
+      const x0 = Math.max(0, Math.floor(cursor.x - REACH));
+      const x1 = Math.min(cols - 1, Math.ceil(cursor.x + REACH));
+      const y0 = Math.max(0, Math.floor(cursor.y - REACH));
+      const y1 = Math.min(rows - 1, Math.ceil(cursor.y + REACH));
+      for (let y = y0; y <= y1; y++) {
+        for (let x = x0; x <= x1; x++) {
+          const d = Math.hypot(x + 0.5 - cursor.x, y + 0.5 - cursor.y) / REACH;
+          if (d >= 1) continue;
+          const v = 1 - d * d;
+          const k = y * cols + x;
+          if (v > heat[k]) heat[k] = v;
         }
       }
     }
 
     function frame() {
-      let moving = false;
+      warm();
+      let moving = cursor !== null;
       for (let k = 0; k < cells.length; k++) {
         const d = cells[k] - glow[k];
         if (Math.abs(d) > 0.004) {
@@ -306,6 +349,12 @@ const [nameFirst, ...nameRest] = profile.name.split(' ');
           moving = true;
         } else {
           glow[k] = cells[k];
+        }
+        if (heat[k] > 0.004) {
+          heat[k] *= COOL;
+          moving = true;
+        } else {
+          heat[k] = 0;
         }
       }
       if (moving || dirty) {
@@ -326,20 +375,50 @@ const [nameFirst, ...nameRest] = profile.name.split(' ');
     requestAnimationFrame(frame);
     setInterval(step, STEP_MS);
 
+    // Pointer: warmth follows it every frame; births happen once per cell it
+    // enters, so resting still does not flood the field.
     let lastCell = -1;
     plate.addEventListener(
       'pointermove',
       (e) => {
         const r = plate.getBoundingClientRect();
-        const x = Math.floor((e.clientX - r.left) / PITCH);
-        const y = Math.floor((e.clientY - r.top) / PITCH);
+        const fx = (e.clientX - r.left) / PITCH;
+        const fy = (e.clientY - r.top) / PITCH;
+        cursor = { x: fx, y: fy };
+        const x = Math.floor(fx);
+        const y = Math.floor(fy);
+        if (x < 0 || y < 0 || x >= cols || y >= rows) return;
         const k = y * cols + x;
-        if (k === lastCell || x < 0 || y < 0 || x >= cols || y >= rows) return;
+        if (k === lastCell) return;
         lastCell = k;
-        if (fall[k] > 0.05) sprinkle(x, y, 1, 0.45);
+        if (fall[k] > 0.05) sprinkle(x, y, 1, 0.35);
       },
       { passive: true },
     );
+
+    plate.addEventListener('pointerleave', () => {
+      cursor = null;
+    });
+
+    // A click on empty plate drops a glider, facing a random way.
+    plate.addEventListener('click', (e) => {
+      if ((e.target as Element).closest('a, button')) return;
+      const r = plate.getBoundingClientRect();
+      const cx = Math.floor((e.clientX - r.left) / PITCH);
+      const cy = Math.floor((e.clientY - r.top) / PITCH);
+      const sx = Math.random() < 0.5 ? 1 : -1;
+      const sy = Math.random() < 0.5 ? 1 : -1;
+      const swap = Math.random() < 0.5;
+      for (const [gx, gy] of GLIDER) {
+        let dx = gx - 1;
+        let dy = gy - 1;
+        if (swap) [dx, dy] = [dy, dx];
+        const x = (cx + dx * sx + cols) % cols;
+        const y = (cy + dy * sy + rows) % rows;
+        cells[y * cols + x] = 1;
+      }
+      dirty = true;
+    });
 
     // Reseed on resize. The observer also fires once on observe(); skip that,
     // or the field would visibly reseed right after it first appears.
