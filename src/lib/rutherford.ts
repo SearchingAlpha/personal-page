@@ -1,4 +1,7 @@
 import type { Electron, Orbit } from '../data/atom';
+import { GAP, dotAt } from './atom-geometry';
+
+export { RX, RY, GAP } from './atom-geometry';
 
 // Google Fonts for the Rutherford design, shared by the atom and topic pages.
 // Design4 substitutes: Inter for Monument, JetBrains Mono for Mono — both at a
@@ -7,39 +10,26 @@ export const FONT_LINKS = [
   'https://fonts.googleapis.com/css2?family=Inter:wght@400&family=JetBrains+Mono:wght@400&display=swap',
 ];
 
-// Orbit geometry as a percentage of the (square) atom box. The ring, the
-// motion path and the no-motion fallback all read these, so the electrons
-// always sit exactly on the line.
-//
-// The minor radius is the closest any orbit comes to the centre. The nucleus
-// is sized (in rutherford.css) to stay inside that, so no electron or tag
-// ever crosses the name.
-export const RX = 44;
-export const RY = 22;
-
 /**
- * Inline custom properties for one electron's lane.
+ * Inline custom properties for one electron: where it and its tag rest when
+ * the script is not running (no JavaScript, or before it starts). The script
+ * takes over from here without a jump, because it starts at the same phase.
  *
- * - `--delay` starts the animation at `phase`. A reversed animation runs
- *   backwards, so its delay is measured from the other end.
- * - `--fx/--fy` are the electron's static position for browsers without
- *   motion paths; `--cx/--sy/--flip` place its tag on the outside of the
- *   orbit when the animations are off.
+ * - `--fx/--fy`: the dot, % of the atom box.
+ * - `--tx0/--ty0`: the tag's translate, hung radially outward with a squared-
+ *   off direction (beside the dot at the sides, centred above and below).
+ * - `--flip0`: the same for small atoms, where tags only go above or below.
  */
-export function laneStyle(orbit: Orbit, e: Electron): string {
-  const delayPhase = orbit.direction === 'ccw' ? 1 - e.phase : e.phase;
-  const theta = e.phase * 2 * Math.PI;
+export function electronStyle(orbit: Orbit, e: Electron): string {
+  const { x, y, ux, uy } = dotAt(orbit, e.phase);
+  const m = Math.max(Math.abs(ux), Math.abs(uy)) || 1;
+  const part = (u: number) => `calc(${(GAP * u).toFixed(2)}px + ${(50 * (u / m - 1)).toFixed(2)}%)`;
   return [
-    `--tilt:${orbit.tilt}deg`,
-    `--period:${orbit.period}s`,
-    `--dir:${orbit.direction === 'ccw' ? 'reverse' : 'normal'}`,
-    `--phase:${e.phase}`,
-    `--delay:${(-delayPhase * orbit.period).toFixed(2)}s`,
-    `--fx:${(50 + RX * Math.cos(theta)).toFixed(2)}%`,
-    `--fy:${(50 + RY * Math.sin(theta)).toFixed(2)}%`,
-    `--cx:${Math.cos(theta).toFixed(3)}`,
-    `--sy:${Math.sin(theta).toFixed(3)}`,
-    `--flip:${e.phase < 0.5 ? 1 : -1}`,
+    `--fx:${(50 + 100 * x).toFixed(2)}%`,
+    `--fy:${(50 + 100 * y).toFixed(2)}%`,
+    `--tx0:${part(ux)}`,
+    `--ty0:${part(uy)}`,
+    `--flip0:${uy >= 0 ? `${GAP}px` : `calc(${-GAP}px - 100%)`}`,
   ].join(';');
 }
 

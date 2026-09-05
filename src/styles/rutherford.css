@@ -3,13 +3,17 @@
    Styled after skills/design4 (Atlantic): a midnight observatory wireframe.
 
    The figure is an atom. The nucleus is a name; each topic is an electron on
-   a tilted elliptical orbit, moving for real: CSS motion paths, no JavaScript.
-   Electrons and their labels are always in front of the nucleus — a section
-   name must never be hidden — and the geometry keeps them clear of it: the
-   nucleus is sized to fit inside the orbits' minor radius. Depth is suggested
-   only by the electrons breathing (scale, opacity) as they go round. The
-   margins of the plate carry the annotations: caption, index, a dated "now"
-   line, links.
+   a tilted elliptical orbit. The motion is one script (src/scripts/atom.ts),
+   which places dots and tags every frame; this stylesheet only lays the
+   atom out and gives each electron a resting place for when the script is
+   not running. Electrons and their labels are always in front of the nucleus
+   — a section name must never be hidden — and the geometry keeps them clear
+   of it: the nucleus is sized to fit inside the orbits' minor radius, and
+   every tag hangs radially outward from its dot, turning round it when
+   another tag is in the way. Depth is suggested only by the electrons
+   breathing (scale, opacity) as they go round. The margins of the plate
+   carry the annotations: caption, index, a dated "now" line, links. Behind
+   everything, on every page, a cellular automaton (src/scripts/field.ts).
 
    Design4 rules honoured here:
    - Dark only. Surfaces step through charcoals; no shadows, no gradients.
@@ -21,8 +25,9 @@
    - One sans at a single weight (400). Size carries the hierarchy.
    - Mono micro-labels, uppercase, 0.16em tracking.
 
-   Geometry (--rx, --ry) is set inline from src/lib/rutherford.ts so the ring,
-   the motion path and the static fallback can never disagree.
+   Geometry (--rx, --ry) is set inline from src/lib/atom-geometry.ts, the
+   same module the script moves the electrons with, so the ring, the motion
+   and the resting positions can never disagree.
    ───────────────────────────────────────────────────────────────────────────── */
 
 :root {
@@ -210,7 +215,7 @@ body.rutherford :is(h1, h2, h3, strong, b) {
   /* A definite plate height makes the 1fr row definite; making the stage a
      size container then lets the atom read that height directly (cqh) without
      relying on percentage heights resolving through the grid. */
-  .plate {
+  .plate--atom {
     height: calc(100svh - 2 * var(--frame));
   }
   .stage {
@@ -265,10 +270,10 @@ body.rutherford :is(h1, h2, h3, strong, b) {
 
 /* Holding an electron switches on the orbit it rides. One rule per orbit
    index; add a line if you ever have more than four orbits. */
-.atom:has(.lane[data-orbit='0'] .electron:hover) .ring[data-orbit='0'],
-.atom:has(.lane[data-orbit='1'] .electron:hover) .ring[data-orbit='1'],
-.atom:has(.lane[data-orbit='2'] .electron:hover) .ring[data-orbit='2'],
-.atom:has(.lane[data-orbit='3'] .electron:hover) .ring[data-orbit='3'] {
+.atom:has(.electron[data-orbit='0']:hover) .ring[data-orbit='0'],
+.atom:has(.electron[data-orbit='1']:hover) .ring[data-orbit='1'],
+.atom:has(.electron[data-orbit='2']:hover) .ring[data-orbit='2'],
+.atom:has(.electron[data-orbit='3']:hover) .ring[data-orbit='3'] {
   border-color: var(--active);
 }
 
@@ -330,53 +335,43 @@ body.rutherford :is(h1, h2, h3, strong, b) {
 /* ── Electrons ─────────────────────────────────────────────────────────────
    Structure per electron:
 
-     .lane           full-size box rotated by --tilt, above the nucleus
-       a.electron    44px touch target moving along the ellipse; breathes
+     a.electron      44px touch target, centred on the dot; the script moves
+                     it with `translate`. Carries its orbit as data-* and its
+                     resting place as --fx/--fy.
+       .body         a point at the dot; the script breathes it (scale,
+                     opacity), so dot and tag swell and fade together
          .dot        a cobalt particle, exactly on the path
-         .anchor     a point pushed a little way outward from the dot, in the
-                     lane's frame — so it is always on the far side from the
-                     nucleus, whatever the tilt
-           .body     counter-rotated so the tag stays upright
-             .tag    label + count, hung from the anchor and leaning outward;
-                     knocks out the ring line behind it
-               .peek the freshest item, under the tag, revealed while held
+         .tag        label + count, hung from the dot on the far side from
+                     the nucleus; knocks out the ring line behind it. The
+                     script sets its `translate`; --tx0/--ty0 is its rest.
+           .peek     the freshest item, under the tag, revealed while held
 
-   Every animation shares the electron's period, delay and direction, so they
-   stay in phase: `orbit` moves the electron, `outward` swings the anchor round
-   the outside, `lean` slides the tag so its near edge stays by the dot,
-   `breathe` scales for near/far. Tags therefore never point at the centre and
-   never reach the nucleus. */
+   Without the script (or before it runs), an electron stands at its resting
+   place — the same picture the script draws at time zero, so it takes over
+   without a jump. */
 
 .electrons {
   display: contents;
 }
 
-.lane {
-  position: absolute;
-  inset: 0;
-  rotate: var(--tilt);
-  z-index: 3;
-  pointer-events: none;
-}
-
 .electron {
-  --ox: 12px; /* how far the anchor sits outward along the major axis */
-  --oy: 20px; /* …and along the minor axis */
   position: absolute;
-  left: 0;
-  top: 0;
+  left: var(--fx);
+  top: var(--fy);
   width: 44px;
   height: 44px;
-  pointer-events: auto;
+  translate: -50% -50%;
+  z-index: 3;
   color: inherit;
   text-decoration: none;
   border-radius: 50%;
-  offset-path: ellipse(var(--rx) var(--ry) at 50% 50%) border-box;
-  offset-rotate: 0deg;
-  animation:
-    orbit var(--period) linear infinite var(--dir),
-    breathe var(--period) linear infinite var(--dir);
-  animation-delay: var(--delay);
+}
+
+/* Live, every electron hangs off the centre and the script translates it. */
+.is-live .electron {
+  left: 50%;
+  top: 50%;
+  translate: none;
 }
 
 .electron:focus-visible {
@@ -384,10 +379,18 @@ body.rutherford :is(h1, h2, h3, strong, b) {
   outline-offset: 2px;
 }
 
-.electron__dot {
+.electron__body {
   position: absolute;
   left: 50%;
   top: 50%;
+  width: 0;
+  height: 0;
+}
+
+.electron__dot {
+  position: absolute;
+  left: 0;
+  top: 0;
   width: 7px;
   height: 7px;
   translate: -50% -50%;
@@ -397,44 +400,18 @@ body.rutherford :is(h1, h2, h3, strong, b) {
   transition: scale var(--dur) var(--ease), background var(--dur) var(--ease);
 }
 
-/* The anchor's base translate is its resting place (phase); the animation
-   overrides it while running and falls away when motion is off. */
-.electron__anchor {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 0;
-  height: 0;
-  translate: calc(var(--cx) * var(--ox)) calc(var(--sy) * var(--oy));
-  animation: outward var(--period) linear infinite var(--dir);
-  animation-delay: var(--delay);
-}
-
-.electron__body {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 0;
-  height: 0;
-  rotate: calc(-1 * var(--tilt));
-}
-
-/* Hung from the anchor. Its horizontal translate leans it outward: at the
-   right-hand end of the orbit the tag's left edge sits by the dot, at the
-   left-hand end its right edge does, at top and bottom it is centred. */
 .electron__tag {
   position: absolute;
   left: 0;
   top: 0;
-  translate: calc(-50% + var(--cx) * 50%) -50%;
+  translate: var(--tx0) var(--ty0);
   padding: 3px 7px;
   background: var(--bg);
   white-space: nowrap;
   line-height: 14px;
   color: var(--ink);
-  transition: color var(--dur) var(--ease);
-  animation: lean var(--period) linear infinite var(--dir);
-  animation-delay: var(--delay);
+  /* Opacity: a tag that must cross another fades out and in (atom.ts). */
+  transition: color var(--dur) var(--ease), opacity 180ms var(--ease);
 }
 
 .electron__count {
@@ -482,102 +459,6 @@ body.rutherford :is(h1, h2, h3, strong, b) {
   transition-delay: 0s;
 }
 
-/* Touch an electron and the whole atom holds still. */
-.atom:has(.electron:hover, .electron:focus-visible)
-  :is(.electron, .electron__anchor, .electron__tag) {
-  animation-play-state: paused;
-}
-
-@keyframes orbit {
-  from {
-    offset-distance: 0%;
-  }
-  to {
-    offset-distance: 100%;
-  }
-}
-
-/* The anchor circles the dot on the outside of the orbit, in the lane's frame:
-   0% is the right-hand end of the major axis, 25% the bottom of the minor. */
-@keyframes outward {
-  0% {
-    translate: var(--ox) 0;
-  }
-  12.5% {
-    translate: calc(var(--ox) * 0.707) calc(var(--oy) * 0.707);
-  }
-  25% {
-    translate: 0 var(--oy);
-  }
-  37.5% {
-    translate: calc(var(--ox) * -0.707) calc(var(--oy) * 0.707);
-  }
-  50% {
-    translate: calc(var(--ox) * -1) 0;
-  }
-  62.5% {
-    translate: calc(var(--ox) * -0.707) calc(var(--oy) * -0.707);
-  }
-  75% {
-    translate: 0 calc(var(--oy) * -1);
-  }
-  87.5% {
-    translate: calc(var(--ox) * 0.707) calc(var(--oy) * -0.707);
-  }
-  100% {
-    translate: var(--ox) 0;
-  }
-}
-
-/* Small atoms have no room for sideways tags: above on the upper half of the
-   orbit, below on the lower, switching at the ends. */
-@keyframes outward-flip {
-  0%,
-  49.99% {
-    translate: 0 var(--oy);
-  }
-  50%,
-  100% {
-    translate: 0 calc(var(--oy) * -1);
-  }
-}
-
-/* The tag slides across its own width so its near edge stays by the dot. */
-@keyframes lean {
-  0% {
-    translate: 0 -50%;
-  }
-  25% {
-    translate: -50% -50%;
-  }
-  50% {
-    translate: -100% -50%;
-  }
-  75% {
-    translate: -50% -50%;
-  }
-  100% {
-    translate: 0 -50%;
-  }
-}
-
-/* Near on the lower half of the orbit, far on the upper: the only depth cue. */
-@keyframes breathe {
-  0%,
-  50%,
-  100% {
-    scale: 1;
-    opacity: 1;
-  }
-  25% {
-    scale: 1.06;
-  }
-  75% {
-    scale: 0.86;
-    opacity: 0.8;
-  }
-}
-
 /* ── Small atoms ───────────────────────────────────────────────────────────
    Container queries against .atom, so these follow the figure's size rather
    than the viewport's. Below 520px the role line no longer fits under the
@@ -588,22 +469,14 @@ body.rutherford :is(h1, h2, h3, strong, b) {
   .nucleus__role {
     display: none;
   }
-  /* Smaller tags without counts, and no sideways reach: they would run off
-     the plate. */
-  .electron {
-    --ox: 0px;
-    --oy: 20px;
-  }
   .electron__count {
     display: none;
   }
-  .electron__anchor {
-    translate: 0 calc(var(--flip) * var(--oy));
-    animation-name: outward-flip;
-  }
+  /* Smaller tags. At rest, no reach to the sides — they would run off the
+     plate: above the dot on the upper half of the orbit, below it on the
+     lower. Live, the script keeps them inside the plate itself. */
   .electron__tag {
-    translate: -50% -50%;
-    animation: none;
+    translate: -50% var(--flip0);
     padding: 2px 5px;
     line-height: 13px;
   }
@@ -622,32 +495,111 @@ body.rutherford :is(h1, h2, h3, strong, b) {
   }
 }
 
-/* ── Stillness ─────────────────────────────────────────────────────────────
-   Reduced motion: electrons rest at their phase. No motion-path support:
-   electrons sit at the precomputed point. Both are the same picture. */
+/* ── The intro ─────────────────────────────────────────────────────────────
+   html.intro: the plate shows only the field and a typed line (.greeting)
+   laid so its name sits exactly where the nucleus's name will be
+   (src/scripts/intro.ts). .greeting.is-named: the greeting has faded, the
+   name stays. html.intro-reveal: the nucleus fades in over the name, the
+   rings grow out, then electrons, then the annotations. Both html classes go
+   once the reveal is done. */
 
-@media (prefers-reduced-motion: reduce) {
-  .electron,
-  .electron__anchor,
-  .electron__tag {
-    animation: none;
-  }
-  .electron {
-    offset-distance: calc(var(--phase) * 100%);
+.greeting {
+  display: none;
+  position: absolute;
+  z-index: 2;
+  margin: 0;
+  font-size: 40px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-feature-settings: 'ss01', 'ss02';
+  white-space: pre;
+  color: var(--ink);
+  pointer-events: none;
+}
+
+.greeting__pre {
+  transition: opacity 0.45s var(--ease);
+}
+
+/* The caret: cobalt, the highlight colour, blinking. */
+.greeting::after {
+  content: '';
+  display: inline-block;
+  width: 0.06em;
+  height: 0.9em;
+  margin-left: 0.08em;
+  vertical-align: -0.08em;
+  background: var(--accent);
+  animation: caret 1s steps(1) infinite;
+}
+
+@keyframes caret {
+  50% {
+    opacity: 0;
   }
 }
 
-@supports not (offset-path: ellipse(10% 10% at 50% 50%) border-box) {
-  .electron,
-  .electron__anchor,
-  .electron__tag {
-    animation: none;
-  }
-  .electron {
-    left: var(--fx);
-    top: var(--fy);
-    translate: -50% -50%;
-  }
+html.intro .greeting {
+  display: block;
+}
+
+.greeting.is-named .greeting__pre,
+.greeting.is-named::after {
+  opacity: 0;
+}
+
+html.intro :is(.plate__head, .plate__foot, .figure__cap, .nucleus, .electron) {
+  opacity: 0;
+}
+
+html.intro :is(.plate__head, .figure__cap) {
+  translate: 0 -6px;
+}
+
+html.intro .plate__foot {
+  translate: 0 6px;
+}
+
+html.intro .ring {
+  opacity: 0;
+  scale: 0.82;
+}
+
+/* The reveal: everything eases to where it belongs, in order. The nucleus
+   frame fades in around the name; the name itself was there all along. */
+html.intro-reveal .greeting {
+  opacity: 0;
+  transition: opacity 0.3s var(--ease) 0.2s;
+}
+
+html.intro-reveal .nucleus {
+  opacity: 1;
+  transition: opacity 0.5s var(--ease);
+}
+
+html.intro-reveal .ring {
+  opacity: 1;
+  scale: 1;
+  transition: opacity 0.8s var(--ease) 0.15s, scale 0.9s var(--ease) 0.15s;
+}
+
+html.intro-reveal .ring[data-orbit='1'] {
+  transition-delay: 0.25s;
+}
+
+html.intro-reveal .ring[data-orbit='2'] {
+  transition-delay: 0.35s;
+}
+
+html.intro-reveal .electron {
+  opacity: 1;
+  transition: opacity 0.6s var(--ease) 0.6s;
+}
+
+html.intro-reveal :is(.plate__head, .plate__foot, .figure__cap) {
+  opacity: 1;
+  translate: 0 0;
+  transition: opacity 0.6s var(--ease) 0.85s, translate 0.6s var(--ease) 0.85s;
 }
 
 /* ── Margins of the plate ──────────────────────────────────────────────── */
@@ -774,15 +726,23 @@ body.rutherford :is(h1, h2, h3, strong, b) {
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Topic pages
+   Topic pages — the same plate, with a column of text where the atom was.
+   The field runs behind it and keeps clear of the column.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+.plate--topic {
+  display: block;
+  padding: 0;
+}
+
 .topic {
+  position: relative;
+  z-index: 1;
   width: 100%;
   max-width: 640px;
   margin: 0 auto;
   padding: clamp(28px, 6vh, 72px) var(--frame) 56px;
-  min-height: 100svh;
+  min-height: calc(100svh - 2 * var(--frame) - 2px);
   display: flex;
   flex-direction: column;
   gap: clamp(32px, 6vh, 56px);

@@ -1,7 +1,8 @@
 ---
 // One topic page = one electron, opened. The title and number come from
 // atom.ts so the label on the orbit, the legend and the heading here can never
-// drift apart.
+// drift apart. The page is the same plate as the home — frame, corner dots,
+// the particle field behind — with a column of text where the atom was.
 import Layout from './Layout.astro';
 import '../styles/rutherford.css';
 import { profile } from '../data/profile';
@@ -26,28 +27,43 @@ const year = new Date().getFullYear();
   bodyClass="rutherford"
   fontLinks={FONT_LINKS}
 >
-  <div class="topic">
-    <header class="topic__head">
-      <a class="topic__back" href="/">
-        <span class="mark" aria-hidden="true"></span>
-        {profile.name}
-      </a>
-      <div>
-        <p class="topic__index">Electron {electronIndex(electron)} / {total}</p>
-        <div class="topic__title-row">
-          <span class="sparkle" aria-hidden="true"><i></i></span>
-          <h1 class="topic__title">{electron.label}</h1>
+  <div class="plate plate--topic">
+    <!-- The particle field, keeping clear of the column. -->
+    <canvas class="field" aria-hidden="true"></canvas>
+    <span class="corners" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+
+    <div class="topic">
+      <header class="topic__head">
+        <a class="topic__back" href="/">
+          <span class="mark" aria-hidden="true"></span>
+          {profile.name}
+        </a>
+        <div>
+          <p class="topic__index">Electron {electronIndex(electron)} / {total}</p>
+          <div class="topic__title-row">
+            <span class="sparkle" aria-hidden="true"><i></i></span>
+            <h1 class="topic__title">{electron.label}</h1>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
 
-    <main class="topic__body">
-      <slot />
-    </main>
+      <main class="topic__body">
+        <slot />
+      </main>
 
-    <footer class="topic__foot">
-      <span>{profile.name} · {year}</span>
-      <a href="/">← Nucleus</a>
-    </footer>
+      <footer class="topic__foot">
+        <span>{profile.name} · {year}</span>
+        <a href="/">← Nucleus</a>
+      </footer>
+    </div>
   </div>
 </Layout>
+
+<script>
+  import { startField } from '../scripts/field';
+
+  const plate = document.querySelector<HTMLElement>('.plate');
+  const canvas = plate?.querySelector<HTMLCanvasElement>('.field');
+  const topic = plate?.querySelector<HTMLElement>('.topic');
+  if (plate && canvas && topic) startField(plate, canvas, { el: topic, shape: 'box' });
+</script>
