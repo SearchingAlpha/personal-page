@@ -1,0 +1,247 @@
+---
+import Layout from '../layouts/Layout.astro';
+import '../styles/aaru.css';
+import { profile } from '../data/profile';
+import { getSortedWriting, getProjects, formatDate } from '../lib/content';
+
+const posts = await getSortedWriting();
+const projects = getProjects();
+const year = new Date().getFullYear();
+const pad = (n: number) => String(n).padStart(2, '0');
+const statusClass = (s: string) =>
+  s === 'Building' ? 'status-building' : s === 'Shipped' ? 'status-shipped' : '';
+const fontLinks = ['https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap'];
+---
+
+<Layout
+  title={`${profile.name} — ${profile.role}`}
+  description={profile.tagline}
+  bodyClass="aaru"
+  fontLinks={fontLinks}
+>
+  <div class="announce">
+    <span>Building in public — a new log every week.</span>
+    <a href="#writing">Read more →</a>
+  </div>
+
+  <header class="wrap" id="top">
+    <nav class="nav">
+      <a class="brand" href="/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+          <path d="M9 4v16M15 4v16M4 9h16M4 15h16" />
+          <circle cx="9" cy="1.6" r="1" fill="currentColor" stroke="none" />
+          <circle cx="15" cy="22.4" r="1" fill="currentColor" stroke="none" />
+          <circle cx="1.6" cy="15" r="1" fill="currentColor" stroke="none" />
+          <circle cx="22.4" cy="9" r="1" fill="currentColor" stroke="none" />
+        </svg>
+        <span>{profile.wordmark}</span>
+      </a>
+      <div class="nav-right">
+        <ul class="nav-links">
+          <li><a class="is-active" href="#top">Home</a></li>
+          <li><a href="#writing">Writing</a></li>
+          <li><a href="#projects">Projects</a></li>
+        </ul>
+        <div class="nav-actions">
+          <a class="btn btn-ghost" href={profile.socials[0].url}>Follow</a>
+          <a class="btn btn-filled" href={`mailto:${profile.email}`}>Contact</a>
+        </div>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <canvas class="plume" aria-hidden="true"></canvas>
+      <h1 class="hero-title">{profile.headline}</h1>
+      <aside class="hero-aside">
+        <p class="label">{profile.subline}</p>
+        <p>{profile.bio}</p>
+        <a class="muted-link" href="#writing">Read the log →</a>
+      </aside>
+    </section>
+  </header>
+
+  <section class="writing" id="writing">
+    <div class="wrap">
+      <div class="section-top">
+        <div>
+          <p class="kicker">Writing</p>
+          <h2 class="statement">
+            Long-form notes from the build — unpolished, honest, and written as it happens.
+          </h2>
+        </div>
+        <p class="kicker tight">{pad(posts.length)} entries</p>
+      </div>
+      {
+        posts.map((post, i) => (
+          <details open={i === 0}>
+            <summary>
+              <span class="num">{pad(i + 1)}</span>
+              <span class="ttl">{post.data.title}</span>
+              <span class="when">
+                {formatDate(post.data.date)}
+                <span class="toggle" aria-hidden="true">+</span>
+              </span>
+            </summary>
+            <div class="acc-body">
+              <p>{post.data.excerpt}</p>
+              <a href="#writing">
+                Read the entry{post.data.readingTime ? ` · ${post.data.readingTime}` : ''}
+              </a>
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="projects" id="projects">
+    <div class="wrap">
+      <div class="section-top">
+        <div>
+          <p class="kicker">Projects</p>
+          <h2 class="statement">The running inventory. Some shipped, some mid-build, one retired.</h2>
+        </div>
+        <p class="kicker tight">{pad(projects.length)} projects</p>
+      </div>
+      <div class="cards">
+        {
+          projects.map((p, i) => (
+            <article class="card">
+              <div class="top">
+                <span>{pad(i + 1)} / {pad(projects.length)}</span>
+                <span class={statusClass(p.status)}>{p.status}</span>
+              </div>
+              <h3>{p.name}</h3>
+              <p>{p.blurb}</p>
+              <div class="tags">
+                {p.tags.map((t) => (
+                  <span class="tag">{t}</span>
+                ))}
+              </div>
+              <div class="bottom">
+                <span>{p.year}</span>
+                {p.url ? <a href={p.url}>Visit →</a> : <span>Private</span>}
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div class="foot-grid">
+        <div>
+          <a class="brand" href="/">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+              <path d="M9 4v16M15 4v16M4 9h16M4 15h16" />
+            </svg>
+            <span>{profile.wordmark}</span>
+          </a>
+          <form class="subscribe" onsubmit="return false">
+            <input type="email" placeholder="Email address" aria-label="Email address" />
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
+        <div class="foot-col">
+          <h4>Site</h4>
+          <ul>
+            <li><a class="muted-link" href="#top">Home</a></li>
+            <li><a class="muted-link" href="#writing">Writing</a></li>
+            <li><a class="muted-link" href="#projects">Projects</a></li>
+          </ul>
+        </div>
+        <div class="foot-col">
+          <h4>Elsewhere</h4>
+          <ul>
+            {profile.socials.map((s) => (
+              <li><a class="muted-link" href={s.url}>{s.label} — {s.handle}</a></li>
+            ))}
+            <li><a class="muted-link" href={`mailto:${profile.email}`}>{profile.email}</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span>© {year} {profile.name}</span>
+        <a class="muted-link" href="/">← All design drafts</a>
+      </div>
+    </div>
+  </footer>
+</Layout>
+
+<script>
+  // Particle plume — hundreds of short white/gray dashes forming a tall,
+  // slowly drifting cloud in the middle of the hero (aaru.com's hero graphic).
+  const hero = document.querySelector<HTMLElement>('.aaru .hero');
+  const canvas = hero?.querySelector<HTMLCanvasElement>('.plume');
+  const ctx = canvas?.getContext('2d');
+
+  if (hero && canvas && ctx) {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    type Dash = { g: number; y: number; len: number; a: number; v: number; ph: number };
+    let dashes: Dash[] = [];
+    let w = 0;
+    let h = 0;
+    let raf = 0;
+
+    // Approximate normal distribution in [-1, 1].
+    const gauss = () => (Math.random() + Math.random() + Math.random() - 1.5) / 1.5;
+    const make = (y = Math.random()): Dash => ({
+      g: gauss(),
+      y,
+      len: 1 + Math.random() * Math.random() * 10,
+      a: 0.12 + Math.random() * 0.8,
+      v: 0.00012 + Math.random() * 0.0004,
+      ph: Math.random() * Math.PI * 2,
+    });
+    // Plume is narrow at the top and widens toward the base, with a gentle lean.
+    const spread = (y: number) => 0.06 + 0.17 * Math.pow(Math.max(y, 0), 1.4);
+    const centre = (y: number) => 0.5 + 0.03 * Math.sin(y * 5.5);
+
+    const size = () => {
+      w = hero.clientWidth;
+      h = hero.clientHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const n = Math.min(2600, Math.round((w * h) / 420));
+      dashes = Array.from({ length: n }, () => make());
+    };
+
+    const paint = (t: number) => {
+      ctx.clearRect(0, 0, w, h);
+      for (const d of dashes) {
+        const x = (centre(d.y) + d.g * spread(d.y)) * w;
+        const alpha = d.a * (0.65 + 0.35 * Math.sin(t * 0.0018 + d.ph));
+        ctx.fillStyle = `rgba(255,255,255,${alpha.toFixed(3)})`;
+        ctx.fillRect(x, d.y * h, d.len, 1.2);
+      }
+    };
+
+    const frame = (t: number) => {
+      for (const d of dashes) {
+        d.y -= d.v;
+        if (d.y < -0.02) Object.assign(d, make(1.02));
+      }
+      paint(t);
+      raf = requestAnimationFrame(frame);
+    };
+
+    size();
+    if (reduced) paint(0);
+    else raf = requestAnimationFrame(frame);
+
+    let to = 0;
+    window.addEventListener('resize', () => {
+      clearTimeout(to);
+      to = window.setTimeout(() => {
+        cancelAnimationFrame(raf);
+        size();
+        if (reduced) paint(0);
+        else raf = requestAnimationFrame(frame);
+      }, 150);
+    });
+  }
+</script>

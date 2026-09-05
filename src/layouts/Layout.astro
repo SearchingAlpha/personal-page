@@ -1,0 +1,66 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  /** Applied to <body> so a design stylesheet can scope everything under it. */
+  bodyClass?: string;
+  /** Google Fonts stylesheet hrefs — each page loads only the fonts it needs. */
+  fontLinks?: string[];
+}
+
+const {
+  title,
+  description = 'Building small, useful things in public.',
+  bodyClass = '',
+  fontLinks = [],
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    {
+      fontLinks.length > 0 && (
+        <>
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        </>
+      )
+    }
+    {fontLinks.map((href) => <link rel="stylesheet" href={href} />)}
+    <title>{title}</title>
+  </head>
+  <body class={bodyClass}>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    margin: 0;
+    min-height: 100vh;
+  }
+  img,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+  a {
+    color: inherit;
+  }
+</style>

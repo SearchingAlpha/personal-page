@@ -1,0 +1,195 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const designs = [
+  {
+    slug: 'aaru',
+    name: 'Aaru',
+    tag: 'design1',
+    desc: 'Dark scientific observatory. Black canvas, one electric-blue section, acid-lime CTA, ultralight type.',
+    swatches: ['#000000', '#1019ec', '#ebfb10', '#ffffff'],
+    bg: '#000000',
+    fg: '#ffffff',
+  },
+  {
+    slug: 'pravah',
+    name: 'Pravah',
+    tag: 'design2',
+    desc: 'Warm parchment engineering dossier. Single-family type, pill CTAs, one dramatic aubergine inversion.',
+    swatches: ['#f3f1ed', '#302023', '#181011', '#d8d4d4'],
+    bg: '#f3f1ed',
+    fg: '#181011',
+  },
+  {
+    slug: 'caldera',
+    name: 'Caldera',
+    tag: 'design3',
+    desc: 'Molten limestone. Warm canvas flooded with ember orange, ultrabold compressed display type, big radii.',
+    swatches: ['#e2e2df', '#fc5000', '#524ae9', '#f5f28e'],
+    bg: '#e2e2df',
+    fg: '#070607',
+  },
+  {
+    slug: 'atlantic',
+    name: 'Atlantic.vc',
+    tag: 'design4',
+    desc: 'Midnight wireframe. Layered charcoals, ice-white type as borders, electric-blue highlights, particle hero.',
+    swatches: ['#000000', '#1f58f2', '#d8eaff', '#ff4105'],
+    bg: '#0d0d0f',
+    fg: '#d8eaff',
+  },
+];
+---
+
+<Layout
+  title="Portfolio drafts — pick a design"
+  fontLinks={[
+    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap',
+  ]}
+>
+  <main class="chooser">
+    <header>
+      <p class="kicker">Building in public · design drafts</p>
+      <h1>Four takes on the same portfolio.</h1>
+      <p class="lede">
+        Each draft renders the same content — a long-form writing feed and a
+        projects list — in a different design system from <code>skills/</code>.
+        Open each and pick the one that feels like you.
+      </p>
+    </header>
+
+    <ul class="grid">
+      {
+        designs.map((d) => (
+          <li>
+            <a href={`/${d.slug}`} style={`--card-bg:${d.bg};--card-fg:${d.fg}`}>
+              <div class="preview">
+                <div class="swatches">
+                  {d.swatches.map((s) => (
+                    <span style={`background:${s}`} />
+                  ))}
+                </div>
+                <span class="name">{d.name}</span>
+              </div>
+              <div class="body">
+                <span class="tag">{d.tag}</span>
+                <p>{d.desc}</p>
+                <span class="go">View draft →</span>
+              </div>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </main>
+</Layout>
+
+<style>
+  .chooser {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #f7f7f8;
+    color: #16161a;
+    min-height: 100vh;
+    padding: 72px 24px 96px;
+  }
+  header {
+    max-width: 720px;
+    margin: 0 auto 56px;
+  }
+  .kicker {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 12px;
+    color: #6b6b72;
+    margin: 0 0 16px;
+  }
+  h1 {
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin: 0 0 16px;
+  }
+  .lede {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #4a4a52;
+    margin: 0;
+  }
+  .lede code {
+    background: #e9e9ec;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 15px;
+  }
+  .grid {
+    max-width: 960px;
+    margin: 0 auto;
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  .grid a {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #e4e4e8;
+    background: #fff;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .grid a:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  }
+  .preview {
+    background: var(--card-bg);
+    color: var(--card-fg);
+    padding: 28px;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .swatches {
+    display: flex;
+    gap: 8px;
+  }
+  .swatches span {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid rgba(128, 128, 128, 0.35);
+  }
+  .preview .name {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .body {
+    padding: 24px 28px 28px;
+  }
+  .tag {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #8a8a90;
+  }
+  .body p {
+    margin: 10px 0 18px;
+    color: #4a4a52;
+    line-height: 1.55;
+  }
+  .go {
+    font-weight: 600;
+    font-size: 15px;
+  }
+  @media (max-width: 720px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,289 @@
+---
+import Layout from '../layouts/Layout.astro';
+import '../styles/atlantic.css';
+import { profile } from '../data/profile';
+import { getSortedWriting, getProjects, formatDate } from '../lib/content';
+
+const posts = await getSortedWriting();
+const projects = getProjects();
+const year = new Date().getFullYear();
+const since = Math.min(...projects.map((p) => p.year));
+const scaffold = ['Make', 'Ship', 'Write', 'Repeat'];
+const fontLinks = [
+  'https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@400;700;800&display=swap',
+];
+---
+
+<Layout
+  title={`${profile.name} — ${profile.role}`}
+  description={profile.tagline}
+  bodyClass="atlantic"
+  fontLinks={fontLinks}
+>
+  <section class="hero" id="top">
+    <canvas aria-hidden="true"></canvas>
+
+    <nav class="nav wrap">
+      <div class="nav-left">
+        <a class="brand" href="/">{profile.wordmark}</a>
+        <ul class="nav-links">
+          <li><a class="is-active" href="#top">Home</a></li>
+          <li><a href="#writing">Writing</a></li>
+          <li><a href="#projects">Projects</a></li>
+          <li><a href="#contact">Contact</a></li>
+          <li><a href={profile.socials[0].url}>GitHub ↗</a></li>
+        </ul>
+      </div>
+      <a class="btn-follow" href={profile.socials[1].url}>Follow along <span aria-hidden="true">↗</span></a>
+    </nav>
+
+    <div class="hero-mid">
+      <h1>
+        Until every <span class="hl">experiment</span> becomes
+        <span class="hl-glow">inevitable</span>
+      </h1>
+    </div>
+
+    <div class="wrap strip">
+      <div class="strip-head">
+        <span class="mono">Portfolio — {String(projects.length).padStart(2, '0')} projects · {since} → {year}</span>
+        <a class="mono" href="#projects">All projects ↓</a>
+      </div>
+      <div class="strip-row">
+        {
+          projects.map((p) => (
+            <a class="cell" href={p.url ?? '#projects'}>
+              <span class="mono fog">{p.tags[0] ?? ''}</span>
+              <span class="name">{p.name}</span>
+              <p>{p.blurb}</p>
+              <div class="foot">
+                <span class={`mono${p.status === 'Building' ? ' status-on' : ''}`}>{p.status}</span>
+                <span class="mono fog">{p.year}</span>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="scaffold">
+      {
+        scaffold.map((w, i) => (
+          <div>
+            <span class="mono fog">{String(i + 1).padStart(2, '0')}</span>
+            <p class={`word${i === scaffold.length - 1 ? ' hl' : ''}`}>{w}</p>
+          </div>
+        ))
+      }
+    </div>
+    <p class="statement">{profile.bio}</p>
+  </section>
+
+  <section class="wrap" id="writing">
+    <div class="section-head">
+      <svg class="sparkle" viewBox="0 0 32 32" fill="none" stroke="#1f58f2" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true">
+        <path d="M16 2 18 14 30 16 18 18 16 30 14 18 2 16 14 14Z" />
+      </svg>
+      <h2>Writing</h2>
+      <span class="mono count">{posts.length} entries</span>
+    </div>
+    <div class="news">
+      {
+        posts.map((post) => (
+          <a href="#writing">
+            <span class="mono fog">{formatDate(post.data.date)}</span>
+            <div>
+              <h3>{post.data.title}</h3>
+              <p>{post.data.excerpt}</p>
+            </div>
+            <div class="right">
+              <span class="mono fog">{post.data.tags[0] ?? 'note'}</span>
+              <span class="arrow" aria-hidden="true">↗</span>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="wrap" id="projects">
+    <div class="section-head">
+      <svg class="sparkle" viewBox="0 0 32 32" fill="none" stroke="#1f58f2" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true">
+        <path d="M16 2 18 14 30 16 18 18 16 30 14 18 2 16 14 14Z" />
+      </svg>
+      <h2>All projects</h2>
+    </div>
+    <div class="labels">
+      <span class="mono">Portfolio</span>
+      <span class="mono fog">{String(projects.length).padStart(2, '0')} projects</span>
+      <span class="mono fog">{since} → {year}</span>
+    </div>
+    <div class="grid">
+      {
+        projects.map((p) => (
+          <a class="cell" href={p.url ?? '#projects'}>
+            <span class="mono fog">{p.tags[0] ?? ''}</span>
+            <span class="name">{p.name}</span>
+            <p>{p.blurb}</p>
+            <div class="foot">
+              <span class={`mono${p.status === 'Building' ? ' status-on' : ''}`}>{p.status}</span>
+              <span class="mono fog">{p.year}</span>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <footer id="contact">
+    <div class="wrap">
+      <h2>Let's talk.</h2>
+      <div class="foot-grid">
+        <div>
+          <span class="mono fog">Contact</span>
+          <p><a href={`mailto:${profile.email}`}>{profile.email}</a></p>
+        </div>
+        <div>
+          <span class="mono fog">Follow</span>
+          <ul>
+            {profile.socials.map((s) => <li><a href={s.url}>{s.label} — {s.handle}</a></li>)}
+          </ul>
+        </div>
+        <div>
+          <span class="mono fog">Based</span>
+          <p>{profile.location}</p>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span class="mono fog">© {year} {profile.name}</span>
+        <a class="mono" href="/">← All design drafts</a>
+      </div>
+    </div>
+  </footer>
+</Layout>
+
+<script>
+  // Particle field: thousands of cobalt points that live inside the dense
+  // regions of a value-noise field and drift along a slowly evolving flow,
+  // fading between frames so they leave smoky trails — atlantic.vc's hero.
+  const hero = document.querySelector<HTMLElement>('.atlantic .hero');
+  const canvas = hero?.querySelector('canvas');
+  const ctx = canvas?.getContext('2d');
+
+  if (hero && canvas && ctx) {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let w = 0;
+    let h = 0;
+    let scale = 0;
+    let count = 0;
+    let pts = new Float32Array(0);
+    let raf = 0;
+    let t = 0;
+    const THRESH = 0.47;
+
+    const hash = (x: number, y: number) => {
+      let n = (Math.imul(x, 374761393) + Math.imul(y, 668265263)) | 0;
+      n = Math.imul(n ^ (n >>> 13), 1274126177);
+      n ^= n >>> 16;
+      return (n >>> 0) / 4294967296;
+    };
+    const noise = (x: number, y: number) => {
+      const xi = Math.floor(x);
+      const yi = Math.floor(y);
+      const xf = x - xi;
+      const yf = y - yi;
+      const u = xf * xf * (3 - 2 * xf);
+      const v = yf * yf * (3 - 2 * yf);
+      const a = hash(xi, yi);
+      const b = hash(xi + 1, yi);
+      const c = hash(xi, yi + 1);
+      const d = hash(xi + 1, yi + 1);
+      return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+    };
+    const fbm = (x: number, y: number) =>
+      0.5 * noise(x, y) +
+      0.25 * noise(x * 2.03 + 17.1, y * 2.03 + 9.7) +
+      0.125 * noise(x * 4.1 + 31.3, y * 4.1 + 3.3) +
+      0.0625 * noise(x * 8.2 + 5.5, y * 8.2 + 27.9);
+    const density = (x: number, y: number) => fbm(x * scale, y * scale + 100);
+
+    // Rejection-sample a position inside the dense regions.
+    const spawn = (i: number) => {
+      for (let k = 0; k < 12; k++) {
+        const x = Math.random() * w;
+        const y = Math.random() * h;
+        if (density(x, y) > THRESH) {
+          pts[i * 2] = x;
+          pts[i * 2 + 1] = y;
+          return;
+        }
+      }
+      pts[i * 2] = Math.random() * w;
+      pts[i * 2 + 1] = Math.random() * h;
+    };
+
+    const size = () => {
+      w = hero.clientWidth;
+      h = hero.clientHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      scale = 2.6 / Math.max(w, 1);
+      count = reduced ? Math.min(60000, Math.round((w * h) / 18)) : Math.min(14000, Math.round((w * h) / 95));
+      pts = new Float32Array(count * 2);
+      for (let i = 0; i < count; i++) spawn(i);
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, w, h);
+    };
+
+    const drawStatic = () => {
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = 'rgba(31,88,242,0.85)';
+      for (let i = 0; i < count; i++) ctx.fillRect(pts[i * 2], pts[i * 2 + 1], 1.2, 1.2);
+    };
+
+    const frame = () => {
+      t += 0.0012;
+      // Quick fade + slow drift keeps the field grainy rather than streaky.
+      ctx.fillStyle = 'rgba(0,0,0,0.26)';
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = 'rgba(31,88,242,0.9)';
+      const fs = scale * 1.6;
+      for (let i = 0; i < count; i++) {
+        let x = pts[i * 2];
+        let y = pts[i * 2 + 1];
+        const a = fbm(x * fs + t, y * fs - t * 0.7) * Math.PI * 4;
+        x += Math.cos(a) * 0.3;
+        y += Math.sin(a) * 0.3;
+        // Recycle particles that leave the canvas or wander out of the clouds.
+        if (x < 0 || x > w || y < 0 || y > h || (density(x, y) < THRESH && Math.random() < 0.06)) {
+          spawn(i);
+          continue;
+        }
+        pts[i * 2] = x;
+        pts[i * 2 + 1] = y;
+        ctx.fillRect(x, y, 1.2, 1.2);
+      }
+      raf = requestAnimationFrame(frame);
+    };
+
+    size();
+    if (reduced) drawStatic();
+    else raf = requestAnimationFrame(frame);
+
+    let to = 0;
+    window.addEventListener('resize', () => {
+      clearTimeout(to);
+      to = window.setTimeout(() => {
+        cancelAnimationFrame(raf);
+        size();
+        if (reduced) drawStatic();
+        else raf = requestAnimationFrame(frame);
+      }, 150);
+    });
+  }
+</script>

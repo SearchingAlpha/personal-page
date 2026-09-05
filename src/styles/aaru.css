@@ -1,0 +1,345 @@
+/* ============================================================================
+   Aaru — dark scientific observatory (design1)
+   Matches aaru.com: lime announcement strip · minimal nav · a huge centered
+   particle plume in the hero with one short headline at left-middle and a
+   hairline-annotated aside bottom-right · one electric-blue accordion section.
+   Tokens from skills/design1. Font: Inter (variable) standing in for abcOracle.
+   ========================================================================== */
+
+.aaru {
+  /* Colors */
+  --color-void-black: #000000;
+  --color-carbon: #0a0a0a;
+  --color-graphite: #18181b;
+  --color-frost: #ffffff;
+  --color-ash: #bababa;
+  --color-smoke: #9d9d9d;
+  --color-slate: #858484;
+  --color-reactor-lime: #ebfb10;
+  --color-plasma-blue: #1019ec;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* Layout — 1280 content column + 64px gutters, as on the source */
+  --page-max-width: 1408px;
+  --gutter: 64px;
+
+  background: var(--color-carbon);
+  color: var(--color-frost);
+  font-family: var(--font-sans);
+  font-weight: 330;
+  font-size: 15px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  font-feature-settings: 'tnum';
+}
+
+.aaru ::selection { background: var(--color-reactor-lime); color: #000; }
+
+.aaru .wrap {
+  max-width: var(--page-max-width);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Announcement strip ------------------------------------------------------- */
+.aaru .announce {
+  background: var(--color-reactor-lime);
+  color: #000;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-align: center;
+}
+.aaru .announce a {
+  color: #000;
+  text-decoration: none;
+  border-bottom: 1px solid #000;
+  padding-bottom: 1px;
+}
+
+/* Nav ---------------------------------------------------------------------- */
+.aaru .nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 22px;
+}
+.aaru .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-frost);
+  text-decoration: none;
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+.aaru .brand svg { width: 22px; height: 22px; }
+.aaru .nav-right { display: flex; align-items: center; gap: 40px; }
+.aaru .nav-links { display: flex; gap: 40px; list-style: none; margin: 0; padding: 0; }
+.aaru .nav-links a {
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-smoke);
+  text-decoration: none;
+}
+.aaru .nav-links a.is-active,
+.aaru .nav-links a:hover { color: var(--color-frost); }
+.aaru .nav-actions { display: flex; gap: 16px; }
+
+/* Buttons — 0 radius, uppercase, weight 400 --------------------------------- */
+.aaru .btn {
+  display: inline-block;
+  font: 400 12px/1 var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 13px 16px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+}
+.aaru .btn-ghost { border-color: rgba(255, 255, 255, 0.45); color: var(--color-frost); }
+.aaru .btn-ghost:hover { border-color: var(--color-frost); }
+.aaru .btn-filled { background: var(--color-frost); color: #000; border-color: var(--color-frost); }
+.aaru .btn-lime { background: var(--color-reactor-lime); color: #000; border-color: var(--color-reactor-lime); padding: 14px 22px; }
+
+/* Hero — particle plume + asymmetric annotations ---------------------------- */
+.aaru .hero {
+  position: relative;
+  height: clamp(560px, calc(100vh - 128px), 900px);
+}
+.aaru .plume {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.aaru .hero-title {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+  font-size: clamp(28px, 2.6vw, 38px);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  max-width: 640px;
+  z-index: 1;
+}
+.aaru .hero-aside {
+  position: absolute;
+  right: 0;
+  bottom: 64px;
+  width: 280px;
+  border-top: 1px solid var(--color-frost);
+  padding-top: 16px;
+  z-index: 1;
+}
+.aaru .hero-aside .label { margin: 0; font-size: 14px; font-weight: 400; }
+.aaru .hero-aside p { margin: 88px 0 0; font-size: 15px; font-weight: 400; color: var(--color-smoke); }
+.aaru .hero-aside .muted-link { display: inline-block; margin-top: 16px; }
+
+/* Sections ----------------------------------------------------------------- */
+.aaru section { padding-block: 96px; }
+.aaru .section-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 32px;
+  margin-bottom: 56px;
+  flex-wrap: wrap;
+}
+.aaru .kicker {
+  margin: 0 0 20px;
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+}
+.aaru .kicker.tight { margin: 0; }
+.aaru .statement {
+  margin: 0;
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 330;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  max-width: 560px;
+}
+
+/* Writing — electric-blue numbered accordion -------------------------------- */
+.aaru .writing { background: var(--color-plasma-blue); color: var(--color-frost); }
+.aaru details { border-top: 1px solid rgba(255, 255, 255, 0.6); }
+.aaru details:last-of-type { border-bottom: 1px solid rgba(255, 255, 255, 0.6); }
+.aaru summary {
+  list-style: none;
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: 16px;
+  align-items: baseline;
+  padding: 24px 0;
+}
+.aaru summary::-webkit-details-marker { display: none; }
+.aaru summary .num { font-size: 13px; font-weight: 400; }
+.aaru summary .ttl { font-size: 13px; font-weight: 400; text-transform: uppercase; letter-spacing: 0.06em; }
+.aaru summary .when {
+  display: flex;
+  gap: 24px;
+  align-items: baseline;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+}
+.aaru summary .toggle { display: inline-block; width: 12px; text-align: center; color: var(--color-frost); transition: transform 0.15s ease; }
+.aaru details[open] .toggle { transform: rotate(45deg); }
+.aaru .acc-body { padding: 0 0 36px 72px; max-width: 640px; }
+.aaru .acc-body p { margin: 0 0 20px; font-size: 15px; font-weight: 400; line-height: 1.5; }
+.aaru .acc-body a {
+  color: var(--color-frost);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  border-bottom: 1px solid var(--color-frost);
+}
+
+/* Projects — graphite cards on black --------------------------------------- */
+.aaru .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.aaru .card {
+  background: var(--color-graphite);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 280px;
+}
+.aaru .card .top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-smoke);
+}
+.aaru .status-building { color: var(--color-reactor-lime); }
+.aaru .status-shipped { color: var(--color-frost); }
+.aaru .card h3 { margin: 6px 0 0; font-size: 20px; font-weight: 400; letter-spacing: -0.01em; line-height: 1.25; }
+.aaru .card p { margin: 0; flex: 1; color: var(--color-ash); font-weight: 400; }
+.aaru .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.aaru .tag {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-smoke);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 4px 8px;
+}
+.aaru .card .bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 14px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-smoke);
+}
+.aaru .card .bottom a { color: var(--color-frost); text-decoration: none; }
+
+/* Footer ------------------------------------------------------------------- */
+.aaru footer { border-top: 1px solid rgba(255, 255, 255, 0.12); padding: 56px 0 40px; }
+.aaru .foot-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 48px; }
+.aaru .subscribe { display: flex; margin-top: 24px; max-width: 380px; }
+.aaru .subscribe input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-right: none;
+  border-radius: 0;
+  color: var(--color-frost);
+  font: 400 13px var(--font-sans);
+  letter-spacing: 0.02em;
+  padding: 12px 14px;
+  outline: none;
+}
+.aaru .subscribe input::placeholder { color: var(--color-smoke); }
+.aaru .subscribe button {
+  background: var(--color-frost);
+  color: #000;
+  border: 1px solid var(--color-frost);
+  border-radius: 0;
+  font: 400 12px var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+.aaru .foot-col h4 {
+  margin: 0 0 16px;
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-smoke);
+}
+.aaru .foot-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.aaru .muted-link { color: var(--color-smoke); text-decoration: none; font-size: 13px; font-weight: 400; }
+.aaru .muted-link:hover { color: var(--color-frost); }
+.aaru .foot-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 56px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-smoke);
+}
+
+/* Responsive --------------------------------------------------------------- */
+@media (max-width: 820px) {
+  .aaru { --gutter: 24px; }
+  .aaru .nav-links,
+  .aaru .btn-ghost { display: none; }
+  .aaru .hero {
+    height: auto;
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 48px;
+    padding-block: 40px;
+  }
+  .aaru .hero-title,
+  .aaru .hero-aside { position: static; transform: none; width: auto; }
+  .aaru summary { grid-template-columns: 40px 1fr; }
+  .aaru summary .when { grid-column: 2; }
+  .aaru .acc-body { padding-left: 56px; }
+  .aaru .cards,
+  .aaru .foot-grid { grid-template-columns: 1fr; }
+}
