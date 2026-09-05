@@ -1,13 +1,39 @@
 ---
 // ── Rutherford ───────────────────────────────────────────────────────────────
-// The home page is an atom: the name as nucleus, every topic an electron on a
-// tilted orbit. Geometry, motion and depth are all CSS — see
-// ../styles/rutherford.css. Which electrons exist lives in ../data/atom.ts.
+// The home page is a plate from a lab notebook. The figure is an atom: the
+// name as nucleus, every topic an electron on a tilted orbit. The margins
+// carry the annotations — caption, index, a dated "now" line, links.
+//
+// Geometry, motion and depth are all CSS — see ../styles/rutherford.css.
+// Which electrons exist lives in ../data/atom.ts.
 import Layout from '../layouts/Layout.astro';
 import '../styles/rutherford.css';
 import { profile } from '../data/profile';
-import { orbits } from '../data/atom';
-import { FONT_LINKS, RX, RY, laneStyle } from '../lib/rutherford';
+import { orbits, electrons, plate, electronIndex } from '../data/atom';
+import { principles } from '../data/principles';
+import { getProjects, getSortedWriting } from '../lib/content';
+import { FONT_LINKS, RX, RY, laneStyle, todoClass } from '../lib/rutherford';
+
+const projects = getProjects();
+const posts = await getSortedWriting();
+
+// What each electron carries: how much is behind it, and the freshest item,
+// revealed while the visitor holds the electron still.
+const facts: Record<string, { count: number; peek: string }> = {
+  '/work': {
+    count: projects.length,
+    peek: projects[0] ? `${projects[0].name} — ${projects[0].status.toLowerCase()}` : '',
+  },
+  '/writing': { count: posts.length, peek: posts[0]?.data.title ?? '' },
+  '/method': { count: principles.length, peek: principles[0] ?? '' },
+  '/elsewhere': { count: profile.socials.length + 1, peek: profile.email },
+};
+const factsFor = (href: string) => facts[href] ?? { count: 0, peek: '' };
+const pad = (n: number) => String(n).padStart(2, '0');
+
+// The build is the observation.
+const observed = new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+const year = new Date().getFullYear();
 ---
 
 <Layout
@@ -16,28 +42,92 @@ import { FONT_LINKS, RX, RY, laneStyle } from '../lib/rutherford';
   bodyClass="rutherford"
   fontLinks={FONT_LINKS}
 >
-  <main class="stage">
-    <div class="atom" style={`--rx:${RX}%;--ry:${RY}%`}>
-      {orbits.map((o) => <div class="ring" style={`--tilt:${o.tilt}deg`} aria-hidden="true" />)}
+  <div class="plate">
+    <header class="plate__head">
+      <span class="plate__wordmark">{profile.name}</span>
+      <span class="plate__meta">{profile.location} · {year}</span>
+    </header>
 
-      <h1 class="nucleus">{profile.name}</h1>
+    <main class="stage">
+      <figure class="figure">
+        <div class="atom" style={`--rx:${RX}%;--ry:${RY}%`}>
+          {
+            orbits.map((o, i) => (
+              <div class="ring" data-orbit={i} style={`--tilt:${o.tilt}deg`} aria-hidden="true" />
+            ))
+          }
 
-      <nav class="electrons" aria-label="Topics">
-        {
-          orbits.map((o) =>
-            o.electrons.map((e) => (
-              <div class="lane" style={laneStyle(o, e)}>
-                <a class="electron" href={e.href}>
-                  <span class="electron__body">
-                    <span class="electron__dot" aria-hidden="true" />
-                    <span class="electron__label">{e.label}</span>
-                  </span>
+          <div class="nucleus">
+            <h1 class="nucleus__name">{profile.name}</h1>
+            <p class="nucleus__role">{profile.role}</p>
+          </div>
+
+          <nav class="electrons" aria-label="Topics">
+            {
+              electrons.map((e) => {
+                const f = factsFor(e.href);
+                return (
+                  <div class="lane" data-orbit={e.orbit} style={laneStyle(orbits[e.orbit], e)}>
+                    <a class="electron" href={e.href}>
+                      <span class="electron__body">
+                        <span class="electron__dot" aria-hidden="true" />
+                        <span class="electron__tag">
+                          <span class="electron__label">{e.label}</span>
+                          <span class="electron__count">{pad(f.count)}</span>
+                          {f.peek && <span class={`electron__peek ${todoClass(f.peek)}`}>{f.peek}</span>}
+                        </span>
+                      </span>
+                    </a>
+                  </div>
+                );
+              })
+            }
+          </nav>
+        </div>
+
+        <figcaption class="figure__cap">
+          {plate.figure} — {profile.name}, {profile.role}. {orbits.length} orbits,
+          {electrons.length} electrons. Observed {observed}.
+        </figcaption>
+      </figure>
+    </main>
+
+    <footer class="plate__foot">
+      <nav class="legend" aria-label="Index">
+        <ol>
+          {
+            electrons.map((e) => (
+              <li>
+                <a href={e.href}>
+                  <span class="legend__i">{electronIndex(e)}</span>
+                  <span class="legend__name">{e.label}</span>
+                  <span class="legend__leader" aria-hidden="true" />
+                  <span class="legend__n">{pad(factsFor(e.href).count)}</span>
                 </a>
-              </div>
-            )),
-          )
-        }
+              </li>
+            ))
+          }
+        </ol>
       </nav>
-    </div>
-  </main>
+
+      <div class="now">
+        <p class="now__eyebrow">Now</p>
+        <p class={`now__text ${todoClass(plate.now)}`}>{plate.now}</p>
+        <p class={`now__stamp ${todoClass(plate.nowUpdated)}`}>{plate.nowUpdated}</p>
+      </div>
+
+      <ul class="plate__links">
+        {
+          profile.socials.map((s) => (
+            <li>
+              <a href={s.url}>{s.label}<span aria-hidden="true"> ↗</span></a>
+            </li>
+          ))
+        }
+        <li>
+          <a href={`mailto:${profile.email}`}>Email</a>
+        </li>
+      </ul>
+    </footer>
+  </div>
 </Layout>

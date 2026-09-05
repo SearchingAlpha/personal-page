@@ -1,10 +1,11 @@
 ---
-// One topic page = one electron, opened. The title comes from atom.ts so the
-// label on the orbit and the heading here can never drift apart.
+// One topic page = one electron, opened. The title and number come from
+// atom.ts so the label on the orbit, the legend and the heading here can never
+// drift apart.
 import Layout from './Layout.astro';
 import '../styles/rutherford.css';
 import { profile } from '../data/profile';
-import { electronFor } from '../data/atom';
+import { electrons, electronFor, electronIndex } from '../data/atom';
 import { FONT_LINKS } from '../lib/rutherford';
 
 interface Props {
@@ -15,6 +16,7 @@ interface Props {
 
 const { href, description = profile.tagline } = Astro.props;
 const electron = electronFor(href);
+const total = String(electrons.length).padStart(2, '0');
 const year = new Date().getFullYear();
 ---
 
@@ -30,7 +32,10 @@ const year = new Date().getFullYear();
         <span class="mark" aria-hidden="true"></span>
         {profile.name}
       </a>
-      <h1 class="topic__title">{electron.label}</h1>
+      <div>
+        <p class="topic__index">Electron {electronIndex(electron)} / {total}</p>
+        <h1 class="topic__title">{electron.label}</h1>
+      </div>
     </header>
 
     <main class="topic__body">
