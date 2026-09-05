@@ -1,0 +1,24 @@
+---
+import Topic from '../layouts/Topic.astro';
+import { getSortedWriting, formatDateShort } from '../lib/content';
+
+const posts = await getSortedWriting();
+---
+
+<Topic href="/writing">
+  <ul class="rows">
+    {
+      posts.map((post) => (
+        <li>
+          <div class="row">
+            <span class="row__top">
+              <span class="row__title">{post.data.title}</span>
+              <span class="row__meta">{formatDateShort(post.data.date)}</span>
+            </span>
+            <p class="row__blurb">{post.data.excerpt}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</Topic>

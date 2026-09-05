@@ -1,0 +1,570 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Rutherford — the site as an atom.
+
+   The nucleus is a name. Each topic is an electron on a tilted elliptical
+   orbit, moving for real: CSS motion paths, no JavaScript. Electrons pass in
+   front of the nucleus on the lower half of their orbit and behind it on the
+   upper half, which is what makes the flat drawing read as a solid.
+
+   Retheming: every colour, rhythm and duration is a custom property in :root.
+   Geometry (--rx, --ry) is set inline from src/lib/rutherford.ts so the ring,
+   the motion path and the static fallback can never disagree.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --bg: #fbfaf8;
+  --ink: #14130f;
+  --ink-soft: #45423b;
+  --muted: #78746a;
+  --rule: #d9d4ca;
+  --rule-strong: #bfb8aa;
+  --accent: #1c6b58;
+  --accent-soft: #e8f0ec;
+
+  --frame: clamp(16px, 4vw, 40px);
+
+  --display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --dur: 220ms;
+  --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e0e0c;
+    --ink: #efece4;
+    --ink-soft: #c4bfb4;
+    --muted: #8d887d;
+    --rule: #2c2b26;
+    --rule-strong: #46433b;
+    --accent: #57b89a;
+    --accent-soft: #16221d;
+  }
+}
+
+body.rutherford {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   The atom (home)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.stage {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: var(--frame);
+  min-height: 100svh;
+}
+
+.atom {
+  position: relative;
+  width: min(100%, calc(100svh - 2 * var(--frame)), 880px);
+  aspect-ratio: 1;
+  container-type: inline-size;
+}
+
+/* ── Rings ─────────────────────────────────────────────────────────────────
+   A border-radius:50% box is a true ellipse. Each ring is tilted by its
+   orbit's --tilt and sits under everything else. */
+
+.ring {
+  position: absolute;
+  left: calc(50% - var(--rx));
+  top: calc(50% - var(--ry));
+  width: calc(var(--rx) * 2);
+  height: calc(var(--ry) * 2);
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  rotate: var(--tilt);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── Nucleus ───────────────────────────────────────────────────────────────
+   Just the name. The soft halo behind it fades the rings as they approach,
+   and hides electrons on the "behind" half of their orbit — that is the depth
+   cue. Kept tight so it never reaches the ends of the major axis. */
+
+.nucleus {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  z-index: 2;
+  margin: 0;
+  padding: 0.3em 0.45em;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(26px, 9cqw, 88px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.nucleus::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -22% -12%;
+  background: radial-gradient(closest-side, var(--bg) 58%, transparent);
+}
+
+/* ── Electrons ─────────────────────────────────────────────────────────────
+   Structure per electron:
+
+     .lane           full-size box rotated by --tilt; carries z-index
+       a.electron    44px touch target moving along the ellipse
+         .body       counter-rotated so the label stays upright; depth scale
+           .dot      sits exactly on the path
+           .label    knocks out the ring line behind it
+
+   Three animations, identical timing, so they stay in phase:
+   `orbit` moves the electron, `depth` flips the lane's z-index halfway round,
+   `breathe` scales the body for near/far. */
+
+.electrons {
+  display: contents;
+}
+
+.lane {
+  position: absolute;
+  inset: 0;
+  rotate: var(--tilt);
+  z-index: var(--z);
+  pointer-events: none;
+  animation: depth var(--period) linear infinite var(--dir);
+  animation-delay: var(--delay);
+}
+
+.electron {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 44px;
+  height: 44px;
+  pointer-events: auto;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 50%;
+  offset-path: ellipse(var(--rx) var(--ry) at 50% 50%) border-box;
+  offset-rotate: 0deg;
+  animation: orbit var(--period) linear infinite var(--dir);
+  animation-delay: var(--delay);
+}
+
+.electron:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.electron__body {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  rotate: calc(-1 * var(--tilt));
+  animation: breathe var(--period) linear infinite var(--dir);
+  animation-delay: var(--delay);
+}
+
+.electron__dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 8px;
+  height: 8px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--bg);
+  transition: scale var(--dur) var(--ease);
+}
+
+.electron__label {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  translate: 0 -50%;
+  padding: 3px 6px;
+  background: var(--bg);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ink);
+  transition: color var(--dur) var(--ease);
+}
+
+.electron:hover .electron__label,
+.electron:focus-visible .electron__label {
+  color: var(--accent);
+}
+
+.electron:hover .electron__dot,
+.electron:focus-visible .electron__dot {
+  scale: 1.5;
+}
+
+/* Touch an electron and the whole atom holds still. */
+.atom:has(.electron:hover, .electron:focus-visible) :is(.lane, .electron, .electron__body) {
+  animation-play-state: paused;
+}
+
+@keyframes orbit {
+  from {
+    offset-distance: 0%;
+  }
+  to {
+    offset-distance: 100%;
+  }
+}
+
+/* 0–50% is the lower half of the ellipse: in front. 50–100%: behind. */
+@keyframes depth {
+  0%,
+  49.99% {
+    z-index: 3;
+  }
+  50%,
+  100% {
+    z-index: 1;
+  }
+}
+
+@keyframes breathe {
+  0%,
+  50%,
+  100% {
+    scale: 1;
+    opacity: 1;
+  }
+  25% {
+    scale: 1.06;
+  }
+  75% {
+    scale: 0.86;
+    opacity: 0.8;
+  }
+}
+
+/* ── Stillness ─────────────────────────────────────────────────────────────
+   Reduced motion: electrons rest at their phase. No motion-path support:
+   electrons sit at the precomputed point. Both are the same picture. */
+
+@media (prefers-reduced-motion: reduce) {
+  .lane,
+  .electron,
+  .electron__body {
+    animation: none;
+  }
+  .electron {
+    offset-distance: calc(var(--phase) * 100%);
+  }
+}
+
+@supports not (offset-path: ellipse(10% 10% at 50% 50%) border-box) {
+  .lane,
+  .electron,
+  .electron__body {
+    animation: none;
+  }
+  .electron {
+    left: var(--fx);
+    top: var(--fy);
+    translate: -50% -50%;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Topic pages
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.topic {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: clamp(28px, 6vh, 72px) var(--frame) 56px;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(32px, 6vh, 56px);
+}
+
+.topic__head {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.topic__back {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color var(--dur) var(--ease);
+}
+
+.topic__back:hover {
+  color: var(--accent);
+}
+
+/* A 16px atom: dot plus one tilted ring. The way back to the nucleus. */
+.mark {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.mark::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.mark::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 5px;
+  width: 16px;
+  height: 6px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  rotate: -30deg;
+}
+
+.topic__title {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(40px, 8vw, 72px);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.topic__body {
+  flex: 1;
+}
+
+.topic__foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.topic__foot a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--dur) var(--ease);
+}
+
+.topic__foot a:hover {
+  color: var(--accent);
+}
+
+/* ── Lists ─────────────────────────────────────────────────────────────── */
+
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rows > li + li {
+  border-top: 1px solid var(--rule);
+}
+
+.row {
+  display: block;
+  padding: 18px 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+.rows > li:first-child .row {
+  padding-top: 0;
+}
+
+.row__top {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.row__title {
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  transition: color var(--dur) var(--ease);
+}
+
+a.row:hover .row__title {
+  color: var(--accent);
+}
+
+.row__meta {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.row__blurb {
+  margin: 6px 0 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+.pill {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.pill--live {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* Numbered principles. */
+.creed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: creed;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.creed li {
+  counter-increment: creed;
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 12px;
+  font-family: var(--display);
+  font-size: clamp(20px, 2.6vw, 26px);
+  line-height: 1.35;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+.creed li::before {
+  content: counter(creed, decimal-leading-zero);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  padding-top: 0.55em;
+}
+
+/* Outbound links. */
+.links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.links > li + li {
+  border-top: 1px solid var(--rule);
+}
+
+.links a {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 16px 0;
+  text-decoration: none;
+  color: inherit;
+  transition: color var(--dur) var(--ease);
+}
+
+.links > li:first-child a {
+  padding-top: 0;
+}
+
+.links a:hover {
+  color: var(--accent);
+}
+
+.links__label {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.links__handle {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  transition: color var(--dur) var(--ease);
+}
+
+.links a:hover .links__handle {
+  color: var(--accent);
+}
+
+/* ── Placeholder marker ────────────────────────────────────────────────────
+   Anything still carrying `TODO —` is outlined so it cannot ship by accident.
+   Delete this rule once the content is real. */
+
+.is-todo {
+  outline: 1px dashed #c2410c;
+  outline-offset: 4px;
+  background: rgba(194, 65, 12, 0.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 1ms !important;
+  }
+}

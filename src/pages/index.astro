@@ -1,170 +1,43 @@
 ---
-// ── Orrery ───────────────────────────────────────────────────────────────────
-// The hub is Pablo. Each satellite is one facet, joined to the centre by a
-// hairline connector so the relationship is drawn rather than implied.
-//
-// Layout, palette and rhythm all live in ../styles/orrery.css.
-// Content lives in ../data/profile.ts, ../data/hub.ts, ../data/projects.ts and
-// the `writing` collection — this file only arranges it.
-
+// ── Rutherford ───────────────────────────────────────────────────────────────
+// The home page is an atom: the name as nucleus, every topic an electron on a
+// tilted orbit. Geometry, motion and depth are all CSS — see
+// ../styles/rutherford.css. Which electrons exist lives in ../data/atom.ts.
 import Layout from '../layouts/Layout.astro';
-import '../styles/orrery.css';
+import '../styles/rutherford.css';
 import { profile } from '../data/profile';
-import { hub } from '../data/hub';
-import { getProjects, getSortedWriting, formatDateShort } from '../lib/content';
-
-const projects = getProjects().slice(0, hub.limits.projects);
-const posts = (await getSortedWriting()).slice(0, hub.limits.writing);
-const principles = hub.principles.slice(0, hub.limits.principles);
-
-const year = new Date().getFullYear();
-
-/** Flags leftover placeholder copy so it is impossible to ship by accident. */
-const todo = (value: string) => (value.trimStart().startsWith('TODO') ? 'is-todo' : '');
-
-/** Satellite metadata by id, so markup order and grid order stay independent. */
-const sat = (id: string) => {
-  const found = hub.satellites.find((s) => s.id === id);
-  if (!found) throw new Error(`Orrery: no satellite defined with id "${id}"`);
-  return found;
-};
-
-const work = sat('work');
-const writing = sat('writing');
-const method = sat('method');
-const elsewhere = sat('elsewhere');
-
-const fontLinks = [
-  'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&display=swap',
-];
+import { orbits } from '../data/atom';
+import { FONT_LINKS, RX, RY, laneStyle } from '../lib/rutherford';
 ---
 
 <Layout
-  title={`${profile.name} — ${profile.role}`}
+  title={profile.name}
   description={profile.tagline}
-  bodyClass="orrery"
-  fontLinks={fontLinks}
+  bodyClass="rutherford"
+  fontLinks={FONT_LINKS}
 >
-  <div class="orrery-page">
-    <div class="system">
-      <!-- ── 01 · What I build ─────────────────────────────────────────── -->
-      <section class={`sat sat--${work.id}`} data-edge={work.edge} aria-labelledby="sat-work">
-        <header class="sat__head">
-          <h2 class="sat__label" id="sat-work">{work.label}</h2>
-          <span class="sat__index">{work.index}</span>
-        </header>
+  <main class="stage">
+    <div class="atom" style={`--rx:${RX}%;--ry:${RY}%`}>
+      {orbits.map((o) => <div class="ring" style={`--tilt:${o.tilt}deg`} aria-hidden="true" />)}
 
-        <ul class="rows">
-          {
-            projects.map((p) => (
-              <li>
-                <a class="row" href={p.url}>
-                  <span class="row__top">
-                    <span class="row__title">{p.name}</span>
-                    <span class={`pill ${p.status === 'Building' ? 'pill--live' : ''}`}>
-                      {p.status}
-                    </span>
-                    <span class="row__meta">{p.year}</span>
+      <h1 class="nucleus">{profile.name}</h1>
+
+      <nav class="electrons" aria-label="Topics">
+        {
+          orbits.map((o) =>
+            o.electrons.map((e) => (
+              <div class="lane" style={laneStyle(o, e)}>
+                <a class="electron" href={e.href}>
+                  <span class="electron__body">
+                    <span class="electron__dot" aria-hidden="true" />
+                    <span class="electron__label">{e.label}</span>
                   </span>
-                  <p class="row__blurb">{p.blurb}</p>
                 </a>
-              </li>
-            ))
-          }
-        </ul>
-      </section>
-
-      <!-- ── 02 · What I write ─────────────────────────────────────────── -->
-      <section
-        class={`sat sat--${writing.id}`}
-        data-edge={writing.edge}
-        aria-labelledby="sat-writing"
-      >
-        <header class="sat__head">
-          <h2 class="sat__label" id="sat-writing">{writing.label}</h2>
-          <span class="sat__index">{writing.index}</span>
-        </header>
-
-        <ul class="rows">
-          {
-            posts.map((post) => (
-              <li>
-                <div class="row">
-                  <span class="row__top">
-                    <span class="row__title">{post.data.title}</span>
-                    <span class="row__meta">{formatDateShort(post.data.date)}</span>
-                  </span>
-                  <p class="row__blurb">{post.data.excerpt}</p>
-                </div>
-              </li>
-            ))
-          }
-        </ul>
-      </section>
-
-      <!-- ── The hub ───────────────────────────────────────────────────── -->
-      <div class="hub">
-        <p class="hub__eyebrow">{profile.location}</p>
-        <h1 class="hub__name">{profile.name}</h1>
-        <p class="hub__role">{profile.role}</p>
-
-        <p class={`hub__now ${todo(hub.now)}`}>
-          {hub.now}
-          <span class={`hub__stamp ${todo(hub.nowUpdated)}`}>Now · {hub.nowUpdated}</span>
-        </p>
-      </div>
-
-      <!-- ── 03 · How I work ───────────────────────────────────────────── -->
-      <section
-        class={`sat sat--${method.id}`}
-        data-edge={method.edge}
-        aria-labelledby="sat-method"
-      >
-        <header class="sat__head">
-          <h2 class="sat__label" id="sat-method">{method.label}</h2>
-          <span class="sat__index">{method.index}</span>
-        </header>
-
-        <ul class="creed">
-          {principles.map((line) => <li class={todo(line)}>{line}</li>)}
-        </ul>
-      </section>
-
-      <!-- ── 04 · Elsewhere ────────────────────────────────────────────── -->
-      <section
-        class={`sat sat--${elsewhere.id}`}
-        data-edge={elsewhere.edge}
-        aria-labelledby="sat-elsewhere"
-      >
-        <header class="sat__head">
-          <h2 class="sat__label" id="sat-elsewhere">{elsewhere.label}</h2>
-          <span class="sat__index">{elsewhere.index}</span>
-        </header>
-
-        <ul class="links">
-          {
-            profile.socials.map((s) => (
-              <li>
-                <a href={s.url}>
-                  <span class="links__label">{s.label}</span>
-                  <span class="links__handle">{s.handle}</span>
-                </a>
-              </li>
-            ))
-          }
-          <li>
-            <a href={`mailto:${profile.email}`} class={todo(profile.email)}>
-              <span class="links__label">Email</span>
-              <span class="links__handle">{profile.email}</span>
-            </a>
-          </li>
-        </ul>
-      </section>
+              </div>
+            )),
+          )
+        }
+      </nav>
     </div>
-
-    <footer class="orrery-foot">
-      <span>{profile.wordmark} · {year}</span>
-      <a href="/drafts">Earlier drafts →</a>
-    </footer>
-  </div>
+  </main>
 </Layout>

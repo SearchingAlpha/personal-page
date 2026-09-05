@@ -1,0 +1,45 @@
+---
+// One topic page = one electron, opened. The title comes from atom.ts so the
+// label on the orbit and the heading here can never drift apart.
+import Layout from './Layout.astro';
+import '../styles/rutherford.css';
+import { profile } from '../data/profile';
+import { electronFor } from '../data/atom';
+import { FONT_LINKS } from '../lib/rutherford';
+
+interface Props {
+  /** Route of this page, e.g. "/work". Must match an electron's href. */
+  href: string;
+  description?: string;
+}
+
+const { href, description = profile.tagline } = Astro.props;
+const electron = electronFor(href);
+const year = new Date().getFullYear();
+---
+
+<Layout
+  title={`${electron.label} — ${profile.name}`}
+  description={description}
+  bodyClass="rutherford"
+  fontLinks={FONT_LINKS}
+>
+  <div class="topic">
+    <header class="topic__head">
+      <a class="topic__back" href="/">
+        <span class="mark" aria-hidden="true"></span>
+        {profile.name}
+      </a>
+      <h1 class="topic__title">{electron.label}</h1>
+    </header>
+
+    <main class="topic__body">
+      <slot />
+    </main>
+
+    <footer class="topic__foot">
+      <span>{profile.name} · {year}</span>
+      <a href="/">← Nucleus</a>
+    </footer>
+  </div>
+</Layout>
