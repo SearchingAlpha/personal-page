@@ -34,8 +34,7 @@ La portada es una lámina de cuaderno de laboratorio. **La figura es un átomo: 
 - **El índice** del pie repite los electrones numerados con líneas de puntos: la forma estable de navegar cuando los que se mueven son demasiado juguetones.
 - **La línea `now`** es lo más parecido a una tesis que tiene la lámina: una frase en presente con la fecha en que era cierta. La fecha obliga a mantenerla.
 - **El pie de figura se fecha solo:** "Observed Sep 2026" es la fecha de la build. La build es la observación.
-- **El campo de partículas es un autómata celular** — la idea de von Neumann, la regla de Conway — corriendo sobre una retícula de puntos detrás de la lámina. Las células vivas brillan en cobalto y se encienden y apagan con suavidad en vez de parpadear; la figura descansa en un claro donde el campo se apaga. Cuando el campo se queda demasiado quieto, una fluctuación del vacío lo reaviva en algún punto. **Mover el puntero perturba el vacío y hace nacer células.** Con `prefers-reduced-motion`, una sola generación, quieta. Es el único JavaScript del sitio (`<script>` al final de `src/pages/index.astro`; las constantes de ajuste están arriba del todo).
-- **Diagramas de Feynman en los márgenes** — dos doodles en trazo fino flanqueando el átomo, numerados *Fig. 2* y *Fig. 3*, como los garabatos al margen de un cuaderno. Los electrones son el motivo del sitio; los diagramas de Feynman son cómo interactúan. Se definen en `plate.marginalia` (`src/data/atom.ts`) y se dibujan en `src/components/Feynman.astro` (aniquilación e⁻e⁺, polarización del vacío, emisión). Desaparecen bajo 1100 px de ancho o 640 px de alto.
+- **El campo de partículas es un autómata celular** — la idea de von Neumann, la regla de Conway — corriendo sobre una retícula de puntos detrás de la lámina. Las células vivas brillan en cobalto y se encienden y apagan con suavidad en vez de parpadear; la figura descansa en un claro que termina justo pasadas las órbitas. Cuando el campo se queda demasiado quieto, dos fluctuaciones del vacío lo reavivan en algún punto. **Mover el puntero perturba el vacío y hace nacer células.** Con `prefers-reduced-motion`, una sola generación, quieta. Es el único JavaScript del sitio (`<script>` al final de `src/pages/index.astro`; las constantes de ajuste están arriba del todo).
 - **Quietud:** con `prefers-reduced-motion` los electrones descansan en su `phase`. Sin soporte de motion paths, se colocan en la posición precalculada. Ambos casos dan la misma imagen que el instante inicial.
 - **Geometría con una sola fuente de verdad:** `RX`/`RY` en `src/lib/rutherford.ts` alimentan el anillo, el motion path y la posición estática, así el electrón está siempre exactamente sobre la línea.
 - **Las etiquetas flotan sobre su punto y el *peek* cae debajo**, nunca hacia los lados: así ningún electrón alcanza jamás el marco del núcleo, a ningún tamaño.
@@ -83,9 +82,8 @@ npm run todo     # lista los placeholders que quedan
 | Qué | Dónde |
 |---|---|
 | Nombre, rol, ubicación, email, redes | `src/data/profile.ts` — alimenta el sitio y los cuatro borradores |
-| Electrones, órbitas, velocidades, línea `now`, diagramas del margen | `src/data/atom.ts` |
+| Electrones, órbitas, velocidades, línea `now` | `src/data/atom.ts` |
 | Densidad, paso y ritmo del campo de partículas | constantes al inicio del `<script>` en `src/pages/index.astro` |
-| Geometría de los diagramas de Feynman | `src/components/Feynman.astro` |
 | Principios (`/method`) | `src/data/principles.ts` |
 | Proyectos (`/work`) | `src/data/projects.ts` |
 | Artículos (`/writing`) | `src/content/writing/*.md` |

@@ -52,15 +52,6 @@ export const electrons: Electron[] = [
 // The margins around the atom, as on a figure in a lab notebook. Anything
 // prefixed `TODO —` is a placeholder: outlined on screen, listed by `npm run todo`.
 
-export type FeynmanKind = 'annihilation' | 'loop' | 'emission';
-
-export interface Marginalia {
-  /** Which diagram to draw. See src/components/Feynman.astro. */
-  kind: FeynmanKind;
-  /** Caption after the figure number. Not uppercased, so formulas survive. */
-  caption: string;
-}
-
 export interface Plate {
   /** Figure label under the atom. */
   figure: string;
@@ -68,22 +59,12 @@ export interface Plate {
   now: string;
   /** When `now` was last true. Shown next to it — keeps you honest. */
   nowUpdated: string;
-  /**
-   * Feynman diagrams doodled in the margins of the plate, numbered Fig. 2
-   * onward. Two are placed (bottom-left, top-right); they hide on narrow
-   * screens. Empty the array to remove them.
-   */
-  marginalia: Marginalia[];
 }
 
 export const plate: Plate = {
   figure: 'Fig. 1',
   now: 'TODO — one line, present tense: what are you doing right now?',
   nowUpdated: 'TODO — Month YYYY',
-  marginalia: [
-    { kind: 'annihilation', caption: 'e⁻e⁺ → γ → μ⁻μ⁺' },
-    { kind: 'loop', caption: 'vacuum polarisation' },
-  ],
 };
 
 /** Zero-padded position of an electron in display order: "01", "02"… */

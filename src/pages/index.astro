@@ -7,7 +7,6 @@
 // Geometry, motion and depth are all CSS — see ../styles/rutherford.css.
 // Which electrons exist lives in ../data/atom.ts.
 import Layout from '../layouts/Layout.astro';
-import Feynman from '../components/Feynman.astro';
 import '../styles/rutherford.css';
 import { profile } from '../data/profile';
 import { orbits, electrons, plate, electronIndex } from '../data/atom';
@@ -102,18 +101,6 @@ const [nameFirst, ...nameRest] = profile.name.split(' ');
           {electrons.length} electrons. Observed {observed}.
         </figcaption>
       </figure>
-
-      <!-- Doodles in the margin. Only the first two are placed. -->
-      {
-        plate.marginalia.slice(0, 2).map((m, i) => (
-          <figure class={`marginalia marginalia--${i}`}>
-            <Feynman kind={m.kind} />
-            <figcaption class="marginalia__cap">
-              Fig. {i + 2} · {m.caption}
-            </figcaption>
-          </figure>
-        ))
-      }
     </main>
 
     <footer class="plate__foot">
@@ -164,11 +151,11 @@ const [nameFirst, ...nameRest] = profile.name.split(' ');
   // pointer disturbs the vacuum and births cells. This is the only script on
   // the site, and the page is complete without it.
 
-  const PITCH = 18; // px between lattice points
-  const DENSITY = 0.14; // initial live fraction
-  const STEP_MS = 640; // one generation
-  const EASE = 0.1; // glow easing per frame
-  const FLOOR = 0.06; // live fraction below which the vacuum fluctuates
+  const PITCH = 15; // px between lattice points
+  const DENSITY = 0.2; // initial live fraction
+  const STEP_MS = 560; // one generation
+  const EASE = 0.14; // glow easing per frame
+  const FLOOR = 0.11; // live fraction below which the vacuum fluctuates
   const COBALT = '31,88,242';
   const ICE = '216,234,255';
 
@@ -199,7 +186,7 @@ const [nameFirst, ...nameRest] = profile.name.split(' ');
 
     // Quantised fill styles, so the draw loop allocates no strings.
     const LEVELS = 16;
-    const live = Array.from({ length: LEVELS + 1 }, (_, i) => `rgba(${COBALT},${(0.18 + 0.62 * (i / LEVELS)).toFixed(3)})`);
+    const live = Array.from({ length: LEVELS + 1 }, (_, i) => `rgba(${COBALT},${(0.3 + 0.7 * (i / LEVELS)).toFixed(3)})`);
 
     function setup() {
       const r = plate.getBoundingClientRect();
@@ -218,13 +205,12 @@ const [nameFirst, ...nameRest] = profile.name.split(' ');
       glow = new Float32Array(n);
       fall = new Float32Array(n);
 
-      // The clearing: nothing within half an atom of its centre, full field
-      // beyond three quarters.
+      // The clearing: nothing inside the orbits, full field just beyond them.
       const a = atom.getBoundingClientRect();
       const cx = a.left - r.left + a.width / 2;
       const cy = a.top - r.top + a.height / 2;
-      const r0 = a.width * 0.48;
-      const r1 = a.width * 0.78;
+      const r0 = a.width * 0.44;
+      const r1 = a.width * 0.66;
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
           const d = Math.hypot(x * PITCH + PITCH / 2 - cx, y * PITCH + PITCH / 2 - cy);
@@ -247,7 +233,7 @@ const [nameFirst, ...nameRest] = profile.name.split(' ');
         for (let x = 0; x < cols; x++) {
           const f = fall[y * cols + x];
           if (f < 0.02) continue;
-          lc.fillStyle = `rgba(${ICE},${(0.09 * f).toFixed(3)})`;
+          lc.fillStyle = `rgba(${ICE},${(0.14 * f).toFixed(3)})`;
           lc.fillRect(x * PITCH + PITCH / 2 - 0.5, y * PITCH + PITCH / 2 - 0.5, 1, 1);
         }
       }
@@ -274,10 +260,12 @@ const [nameFirst, ...nameRest] = profile.name.split(' ');
         }
       }
       [cells, next] = [next, cells];
-      // Life left alone settles into still lifes. A quiet field gets a
-      // fluctuation somewhere, so it never quite goes out.
+      // Life left alone settles into still lifes. A quiet field gets two
+      // fluctuations somewhere, so it never quite goes out.
       if (pop < cells.length * FLOOR) {
-        sprinkle(Math.floor(Math.random() * cols), Math.floor(Math.random() * rows), 3, 0.6);
+        for (let i = 0; i < 2; i++) {
+          sprinkle(Math.floor(Math.random() * cols), Math.floor(Math.random() * rows), 3, 0.6);
+        }
       }
       dirty = true;
     }
@@ -303,7 +291,7 @@ const [nameFirst, ...nameRest] = profile.name.split(' ');
           const g = glow[k] * fall[k];
           if (g < 0.03) continue;
           ctx.fillStyle = live[Math.round(g * LEVELS)];
-          const s = 1.2 + 1.6 * g;
+          const s = 1.6 + 1.8 * g;
           ctx.fillRect(x * PITCH + PITCH / 2 - s / 2, y * PITCH + PITCH / 2 - s / 2, s, s);
         }
       }
