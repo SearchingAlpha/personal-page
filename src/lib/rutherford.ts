@@ -10,8 +10,12 @@ export const FONT_LINKS = [
 // Orbit geometry as a percentage of the (square) atom box. The ring, the
 // motion path and the no-motion fallback all read these, so the electrons
 // always sit exactly on the line.
-export const RX = 38;
-export const RY = 15;
+//
+// The minor radius is the closest any orbit comes to the centre. The nucleus
+// is sized (in rutherford.css) to stay inside that, so no electron or tag
+// ever crosses the name.
+export const RX = 44;
+export const RY = 22;
 
 /**
  * Inline custom properties for one electron's lane.
@@ -19,8 +23,8 @@ export const RY = 15;
  * - `--delay` starts the animation at `phase`. A reversed animation runs
  *   backwards, so its delay is measured from the other end.
  * - `--fx/--fy` are the electron's static position for browsers without
- *   motion paths; `--z` is whether that position is in front of or behind the
- *   nucleus (bottom half of the ellipse reads as "in front").
+ *   motion paths; `--cx/--sy/--flip` place its tag on the outside of the
+ *   orbit when the animations are off.
  */
 export function laneStyle(orbit: Orbit, e: Electron): string {
   const delayPhase = orbit.direction === 'ccw' ? 1 - e.phase : e.phase;
@@ -31,9 +35,11 @@ export function laneStyle(orbit: Orbit, e: Electron): string {
     `--dir:${orbit.direction === 'ccw' ? 'reverse' : 'normal'}`,
     `--phase:${e.phase}`,
     `--delay:${(-delayPhase * orbit.period).toFixed(2)}s`,
-    `--z:${e.phase < 0.5 ? 3 : 1}`,
     `--fx:${(50 + RX * Math.cos(theta)).toFixed(2)}%`,
     `--fy:${(50 + RY * Math.sin(theta)).toFixed(2)}%`,
+    `--cx:${Math.cos(theta).toFixed(3)}`,
+    `--sy:${Math.sin(theta).toFixed(3)}`,
+    `--flip:${e.phase < 0.5 ? 1 : -1}`,
   ].join(';');
 }
 

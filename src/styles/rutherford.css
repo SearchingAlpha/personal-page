@@ -4,10 +4,12 @@
 
    The figure is an atom. The nucleus is a name; each topic is an electron on
    a tilted elliptical orbit, moving for real: CSS motion paths, no JavaScript.
-   Electrons pass in front of the nucleus on the lower half of their orbit and
-   behind it on the upper half, which is what makes the flat drawing read as a
-   solid. The margins of the plate carry the annotations: caption, index, a
-   dated "now" line, links.
+   Electrons and their labels are always in front of the nucleus — a section
+   name must never be hidden — and the geometry keeps them clear of it: the
+   nucleus is sized to fit inside the orbits' minor radius. Depth is suggested
+   only by the electrons breathing (scale, opacity) as they go round. The
+   margins of the plate carry the annotations: caption, index, a dated "now"
+   line, links.
 
    Design4 rules honoured here:
    - Dark only. Surfaces step through charcoals; no shadows, no gradients.
@@ -45,7 +47,7 @@
   --accent: var(--cobalt); /* highlight, never interactive */
   --active: var(--signal); /* interactive, never decorative */
 
-  --frame: clamp(14px, 3vw, 32px);
+  --frame: clamp(12px, 2.5vw, 24px);
   /* Design4's bordered container: 8px radius, so corner dots sit on the corner. */
   --radius-frame: 8px;
   --radius-tag: 8px;
@@ -142,10 +144,10 @@ body.rutherford :is(h1, h2, h3, strong, b) {
   border: 1px solid var(--wire);
   border-radius: var(--radius-frame);
   background: var(--bg);
-  padding: clamp(16px, 2.5vw, 28px) clamp(18px, 3vw, 36px);
+  padding: clamp(14px, 2vw, 22px) clamp(16px, 2.5vw, 30px);
   display: grid;
   grid-template-rows: auto 1fr auto;
-  gap: clamp(12px, 2vh, 24px);
+  gap: clamp(8px, 1.5vh, 16px);
   min-height: calc(100svh - 2 * var(--frame));
 }
 
@@ -159,7 +161,12 @@ body.rutherford :is(h1, h2, h3, strong, b) {
   pointer-events: none;
 }
 
-.plate > .corners,
+/* The corners stay absolutely positioned: made relative they would become a
+   grid item and steal the first row. */
+.plate > .corners {
+  z-index: 1;
+}
+
 .plate__head,
 .stage,
 .plate__foot {
@@ -187,14 +194,40 @@ body.rutherford :is(h1, h2, h3, strong, b) {
   min-height: 0;
 }
 
-/* Sized so head, caption and foot still fit beside it on a 720px-tall laptop. */
+/* Small or short screens: the figure is sized from the viewport height with a
+   budget for head, caption and foot. Larger screens override this below and
+   let the atom fill whatever height the plate has left. */
 .figure {
   margin: 0;
-  width: min(100%, clamp(300px, calc(100svh - 320px), 760px));
+  width: min(100%, clamp(300px, calc(100svh - 300px), 760px));
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
+}
+
+@media (min-width: 761px) and (min-height: 600px) {
+  /* A definite plate height makes the 1fr row definite; making the stage a
+     size container then lets the atom read that height directly (cqh) without
+     relying on percentage heights resolving through the grid. */
+  .plate {
+    height: calc(100svh - 2 * var(--frame));
+  }
+  .stage {
+    container-type: size;
+    min-height: 0;
+  }
+  .stage .figure {
+    width: auto;
+  }
+  /* As tall as the stage allows minus two caption lines, square, and narrow
+     enough that a tag hanging off the end of the major axis (≈130px beyond
+     the dot, minus the atom's own 6% margin) still lands inside the stage.
+     Selector is descendant-qualified so it outranks the base .atom rule below
+     regardless of source order. */
+  .stage .atom {
+    width: min(calc(100cqw - 190px), calc(100cqh - 48px));
+  }
 }
 
 .figure__cap {
@@ -241,10 +274,14 @@ body.rutherford :is(h1, h2, h3, strong, b) {
 
 /* ── Nucleus ───────────────────────────────────────────────────────────────
    The name inside a wireframe frame with cobalt corner dots — design4's
-   "bordered container": a viewport you look into. Its flat surface is what
-   hides rings and electrons on the "behind" half of their orbit; that is the
-   depth cue, done with surface stepping instead of a gradient. Capped in atom
-   units so a long name can never reach the ends of the major axis (38cqw). */
+   "bordered container": a viewport you look into. Its flat surface hides the
+   rings where they pass behind it.
+
+   Sized to stay inside the orbits' minor radius (--ry, 22cqw), which is the
+   closest any electron comes to the centre: a 7.5cqw name with the role under
+   it gives a box about 18cqw wide and 18cqw tall, and no dot or tag on any
+   orbit reaches it. Longer names scale down by character count so the frame
+   never widens into the orbits' path. */
 
 .nucleus {
   position: absolute;
@@ -252,12 +289,13 @@ body.rutherford :is(h1, h2, h3, strong, b) {
   top: 50%;
   translate: -50% -50%;
   z-index: 2;
-  max-width: 62cqw;
+  min-width: 30cqw;
+  max-width: 40cqw;
   padding: 0.34em 0.38em 0.4em;
   border: 1px solid var(--wire);
   border-radius: var(--radius-tag);
   background: var(--bg);
-  font-size: clamp(26px, 9cqw, 84px);
+  font-size: clamp(22px, min(7.5cqw, calc(56cqw / var(--name-chars, 6))), 80px);
   text-align: center;
 }
 
@@ -277,11 +315,14 @@ body.rutherford :is(h1, h2, h3, strong, b) {
 
 /* The name sets the frame's width; the role wraps beneath it rather than
    stretching the frame out toward the tags at the orbit ends. */
+/* Inline-size containment: the role wraps to the frame's width instead of
+   pushing the frame out to the length of its own single line. */
 .nucleus__role {
-  margin: 0.4em auto 0;
-  max-width: min(100%, 24ch);
-  font-size: clamp(8.5px, 1.3cqw, 10px);
-  line-height: 1.6;
+  contain: inline-size;
+  margin: 0.45em auto 0;
+  font-size: clamp(8px, 1.2cqw, 9.5px);
+  letter-spacing: 0.14em;
+  line-height: 1.55;
   color: var(--muted);
   text-wrap: balance;
 }
@@ -289,16 +330,22 @@ body.rutherford :is(h1, h2, h3, strong, b) {
 /* ── Electrons ─────────────────────────────────────────────────────────────
    Structure per electron:
 
-     .lane           full-size box rotated by --tilt; carries z-index
-       a.electron    44px touch target moving along the ellipse
-         .body       counter-rotated so the tag stays upright; depth scale
-           .dot      a cobalt particle, exactly on the path
-           .tag      label + count, above the dot; knocks out the ring line
-           .peek     the freshest item, below the dot, revealed while held
+     .lane           full-size box rotated by --tilt, above the nucleus
+       a.electron    44px touch target moving along the ellipse; breathes
+         .dot        a cobalt particle, exactly on the path
+         .anchor     a point pushed a little way outward from the dot, in the
+                     lane's frame — so it is always on the far side from the
+                     nucleus, whatever the tilt
+           .body     counter-rotated so the tag stays upright
+             .tag    label + count, hung from the anchor and leaning outward;
+                     knocks out the ring line behind it
+               .peek the freshest item, under the tag, revealed while held
 
-   Three animations, identical timing, so they stay in phase:
-   `orbit` moves the electron, `depth` flips the lane's z-index halfway round,
-   `breathe` scales the body for near/far. */
+   Every animation shares the electron's period, delay and direction, so they
+   stay in phase: `orbit` moves the electron, `outward` swings the anchor round
+   the outside, `lean` slides the tag so its near edge stays by the dot,
+   `breathe` scales for near/far. Tags therefore never point at the centre and
+   never reach the nucleus. */
 
 .electrons {
   display: contents;
@@ -308,13 +355,13 @@ body.rutherford :is(h1, h2, h3, strong, b) {
   position: absolute;
   inset: 0;
   rotate: var(--tilt);
-  z-index: var(--z);
+  z-index: 3;
   pointer-events: none;
-  animation: depth var(--period) linear infinite var(--dir);
-  animation-delay: var(--delay);
 }
 
 .electron {
+  --ox: 12px; /* how far the anchor sits outward along the major axis */
+  --oy: 20px; /* …and along the minor axis */
   position: absolute;
   left: 0;
   top: 0;
@@ -326,7 +373,9 @@ body.rutherford :is(h1, h2, h3, strong, b) {
   border-radius: 50%;
   offset-path: ellipse(var(--rx) var(--ry) at 50% 50%) border-box;
   offset-rotate: 0deg;
-  animation: orbit var(--period) linear infinite var(--dir);
+  animation:
+    orbit var(--period) linear infinite var(--dir),
+    breathe var(--period) linear infinite var(--dir);
   animation-delay: var(--delay);
 }
 
@@ -335,21 +384,10 @@ body.rutherford :is(h1, h2, h3, strong, b) {
   outline-offset: 2px;
 }
 
-.electron__body {
+.electron__dot {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 0;
-  height: 0;
-  rotate: calc(-1 * var(--tilt));
-  animation: breathe var(--period) linear infinite var(--dir);
-  animation-delay: var(--delay);
-}
-
-.electron__dot {
-  position: absolute;
-  left: 0;
-  top: 0;
   width: 7px;
   height: 7px;
   translate: -50% -50%;
@@ -359,20 +397,44 @@ body.rutherford :is(h1, h2, h3, strong, b) {
   transition: scale var(--dur) var(--ease), background var(--dur) var(--ease);
 }
 
-/* The tag floats centred above its dot, the peek centred below it. Neither
-   reaches sideways, so nothing ever runs into the nucleus frame, and the
-   knockouts stay exactly text-sized. */
+/* The anchor's base translate is its resting place (phase); the animation
+   overrides it while running and falls away when motion is off. */
+.electron__anchor {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  translate: calc(var(--cx) * var(--ox)) calc(var(--sy) * var(--oy));
+  animation: outward var(--period) linear infinite var(--dir);
+  animation-delay: var(--delay);
+}
+
+.electron__body {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  rotate: calc(-1 * var(--tilt));
+}
+
+/* Hung from the anchor. Its horizontal translate leans it outward: at the
+   right-hand end of the orbit the tag's left edge sits by the dot, at the
+   left-hand end its right edge does, at top and bottom it is centred. */
 .electron__tag {
   position: absolute;
   left: 0;
-  bottom: 9px;
-  translate: -50% 0;
+  top: 0;
+  translate: calc(-50% + var(--cx) * 50%) -50%;
   padding: 3px 7px;
   background: var(--bg);
   white-space: nowrap;
   line-height: 14px;
   color: var(--ink);
   transition: color var(--dur) var(--ease);
+  animation: lean var(--period) linear infinite var(--dir);
+  animation-delay: var(--delay);
 }
 
 .electron__count {
@@ -380,10 +442,12 @@ body.rutherford :is(h1, h2, h3, strong, b) {
   color: var(--muted);
 }
 
+/* Under the tag, centred on it, out of the tag's flow so the knockout stays
+   label-sized. */
 .electron__peek {
   position: absolute;
-  left: 0;
-  top: 9px;
+  left: 50%;
+  top: 100%;
   translate: -50% -4px;
   padding: 2px 7px 3px;
   background: var(--bg);
@@ -419,7 +483,8 @@ body.rutherford :is(h1, h2, h3, strong, b) {
 }
 
 /* Touch an electron and the whole atom holds still. */
-.atom:has(.electron:hover, .electron:focus-visible) :is(.lane, .electron, .electron__body) {
+.atom:has(.electron:hover, .electron:focus-visible)
+  :is(.electron, .electron__anchor, .electron__tag) {
   animation-play-state: paused;
 }
 
@@ -432,18 +497,71 @@ body.rutherford :is(h1, h2, h3, strong, b) {
   }
 }
 
-/* 0–50% is the lower half of the ellipse: in front. 50–100%: behind. */
-@keyframes depth {
-  0%,
-  49.99% {
-    z-index: 3;
+/* The anchor circles the dot on the outside of the orbit, in the lane's frame:
+   0% is the right-hand end of the major axis, 25% the bottom of the minor. */
+@keyframes outward {
+  0% {
+    translate: var(--ox) 0;
   }
-  50%,
+  12.5% {
+    translate: calc(var(--ox) * 0.707) calc(var(--oy) * 0.707);
+  }
+  25% {
+    translate: 0 var(--oy);
+  }
+  37.5% {
+    translate: calc(var(--ox) * -0.707) calc(var(--oy) * 0.707);
+  }
+  50% {
+    translate: calc(var(--ox) * -1) 0;
+  }
+  62.5% {
+    translate: calc(var(--ox) * -0.707) calc(var(--oy) * -0.707);
+  }
+  75% {
+    translate: 0 calc(var(--oy) * -1);
+  }
+  87.5% {
+    translate: calc(var(--ox) * 0.707) calc(var(--oy) * -0.707);
+  }
   100% {
-    z-index: 1;
+    translate: var(--ox) 0;
   }
 }
 
+/* Small atoms have no room for sideways tags: above on the upper half of the
+   orbit, below on the lower, switching at the ends. */
+@keyframes outward-flip {
+  0%,
+  49.99% {
+    translate: 0 var(--oy);
+  }
+  50%,
+  100% {
+    translate: 0 calc(var(--oy) * -1);
+  }
+}
+
+/* The tag slides across its own width so its near edge stays by the dot. */
+@keyframes lean {
+  0% {
+    translate: 0 -50%;
+  }
+  25% {
+    translate: -50% -50%;
+  }
+  50% {
+    translate: -100% -50%;
+  }
+  75% {
+    translate: -50% -50%;
+  }
+  100% {
+    translate: 0 -50%;
+  }
+}
+
+/* Near on the lower half of the orbit, far on the upper: the only depth cue. */
 @keyframes breathe {
   0%,
   50%,
@@ -462,19 +580,45 @@ body.rutherford :is(h1, h2, h3, strong, b) {
 
 /* ── Small atoms ───────────────────────────────────────────────────────────
    Container queries against .atom, so these follow the figure's size rather
-   than the viewport's. Below 480px the role line no longer fits under the
+   than the viewport's. Below 520px the role line no longer fits under the
    name (the caption carries it). Below 420px the peek goes: there is no hover
    to reveal it, and no room for it. */
 
-@container (max-width: 480px) {
+@container (max-width: 520px) {
   .nucleus__role {
     display: none;
+  }
+  /* Smaller tags without counts, and no sideways reach: they would run off
+     the plate. */
+  .electron {
+    --ox: 0px;
+    --oy: 20px;
+  }
+  .electron__count {
+    display: none;
+  }
+  .electron__anchor {
+    translate: 0 calc(var(--flip) * var(--oy));
+    animation-name: outward-flip;
+  }
+  .electron__tag {
+    translate: -50% -50%;
+    animation: none;
+    padding: 2px 5px;
+    line-height: 13px;
+  }
+  .electron__label,
+  .electron__count {
+    font-size: 9px;
   }
 }
 
 @container (max-width: 420px) {
   .electron__peek {
     display: none;
+  }
+  .nucleus {
+    font-size: clamp(20px, min(7.5cqw, calc(56cqw / var(--name-chars, 6))), 80px);
   }
 }
 
@@ -483,9 +627,9 @@ body.rutherford :is(h1, h2, h3, strong, b) {
    electrons sit at the precomputed point. Both are the same picture. */
 
 @media (prefers-reduced-motion: reduce) {
-  .lane,
   .electron,
-  .electron__body {
+  .electron__anchor,
+  .electron__tag {
     animation: none;
   }
   .electron {
@@ -494,9 +638,9 @@ body.rutherford :is(h1, h2, h3, strong, b) {
 }
 
 @supports not (offset-path: ellipse(10% 10% at 50% 50%) border-box) {
-  .lane,
   .electron,
-  .electron__body {
+  .electron__anchor,
+  .electron__tag {
     animation: none;
   }
   .electron {
@@ -628,11 +772,6 @@ body.rutherford :is(h1, h2, h3, strong, b) {
   }
 }
 
-@media (max-width: 480px) {
-  .electron__count {
-    display: none;
-  }
-}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Topic pages

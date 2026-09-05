@@ -65,7 +65,7 @@ const [nameFirst, ...nameRest] = profile.name.split(' ');
             ))
           }
 
-          <div class="nucleus">
+          <div class="nucleus" style={`--name-chars:${profile.name.length}`}>
             <span class="corners" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
             <h1 class="nucleus__name">
               {nameFirst}{nameRest.length > 0 && <span class="hl"> {nameRest.join(' ')}</span>}
@@ -80,13 +80,15 @@ const [nameFirst, ...nameRest] = profile.name.split(' ');
                 return (
                   <div class="lane" data-orbit={e.orbit} style={laneStyle(orbits[e.orbit], e)}>
                     <a class="electron" href={e.href}>
-                      <span class="electron__body">
-                        <span class="electron__dot" aria-hidden="true" />
-                        <span class="electron__tag">
-                          <span class="electron__label">{e.label}</span>
-                          <span class="electron__count">{pad(f.count)}</span>
+                      <span class="electron__dot" aria-hidden="true" />
+                      <span class="electron__anchor">
+                        <span class="electron__body">
+                          <span class="electron__tag">
+                            <span class="electron__label">{e.label}</span>
+                            <span class="electron__count">{pad(f.count)}</span>
+                            {f.peek && <span class={`electron__peek ${todoClass(f.peek)}`}>{f.peek}</span>}
+                          </span>
                         </span>
-                        {f.peek && <span class={`electron__peek ${todoClass(f.peek)}`}>{f.peek}</span>}
                       </span>
                     </a>
                   </div>

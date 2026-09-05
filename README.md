@@ -26,9 +26,10 @@ La portada es una lámina de cuaderno de laboratorio. **La figura es un átomo: 
 
 ### Cómo está hecho
 
-- **Órbitas:** una `div` con `border-radius: 50%` de 76 % × 30 % es una elipse real. Tres, rotadas 0°, 60° y 120°: el símbolo clásico del átomo.
+- **Órbitas:** una `div` con `border-radius: 50%` de 88 % × 44 % es una elipse real. Tres, rotadas 0°, 60° y 120°: el símbolo clásico del átomo.
 - **Movimiento:** cada electrón sigue `offset-path: ellipse(...)` con una animación lineal infinita. Cero JavaScript.
-- **Profundidad:** los electrones pasan *por delante* del núcleo en la mitad inferior de su órbita y *por detrás* en la superior. Se consigue animando el `z-index` de su carril en sincronía con el movimiento, más un halo del color del fondo detrás del nombre que los oculta al pasar. Es lo que hace que el dibujo plano se lea como un sólido.
+- **Los nombres de sección nunca se tapan.** Los electrones y sus etiquetas van siempre por delante del núcleo, y **cada etiqueta cuelga por el lado exterior de su órbita**: un ancla se desplaza un poco hacia fuera del punto, en el marco de la órbita, y la etiqueta se inclina hacia fuera para que su borde cercano quede junto al punto — animado en sincronía con el electrón. Así ninguna etiqueta apunta jamás al centro. En átomos pequeños (móvil), donde una etiqueta lateral se saldría de la lámina, van encima en la mitad superior de la órbita y debajo en la inferior. El núcleo, además, se dimensiona para caber dentro del radio menor de las órbitas, y el nombre escala por número de caracteres. La profundidad la sugiere solo la respiración de los electrones (escala y opacidad) al dar la vuelta.
+- **El átomo llena la altura disponible.** En pantallas de escritorio la lámina tiene altura fija y el átomo crece hasta ocupar todo lo que dejan cabecera, pie y leyenda; en pantallas pequeñas o bajas se dimensiona desde el ancho.
 - **Etiquetas siempre derechas:** el carril está rotado por la inclinación de su órbita; el cuerpo del electrón se contra-rota exactamente lo mismo.
 - **Cada electrón lleva su cuenta** (cuántos proyectos, artículos…) y, al sostenerlo, **revela lo más reciente** en una línea en cursiva. Sostenerlo también **ilumina la órbita** que recorre y **detiene el átomo entero** para poder hacer clic con calma.
 - **El índice** del pie repite los electrones numerados con líneas de puntos: la forma estable de navegar cuando los que se mueven son demasiado juguetones.
