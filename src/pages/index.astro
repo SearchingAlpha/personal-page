@@ -1,195 +1,170 @@
 ---
-import Layout from '../layouts/Layout.astro';
+// ── Orrery ───────────────────────────────────────────────────────────────────
+// The hub is Pablo. Each satellite is one facet, joined to the centre by a
+// hairline connector so the relationship is drawn rather than implied.
+//
+// Layout, palette and rhythm all live in ../styles/orrery.css.
+// Content lives in ../data/profile.ts, ../data/hub.ts, ../data/projects.ts and
+// the `writing` collection — this file only arranges it.
 
-const designs = [
-  {
-    slug: 'aaru',
-    name: 'Aaru',
-    tag: 'design1',
-    desc: 'Dark scientific observatory. Black canvas, one electric-blue section, acid-lime CTA, ultralight type.',
-    swatches: ['#000000', '#1019ec', '#ebfb10', '#ffffff'],
-    bg: '#000000',
-    fg: '#ffffff',
-  },
-  {
-    slug: 'pravah',
-    name: 'Pravah',
-    tag: 'design2',
-    desc: 'Warm parchment engineering dossier. Single-family type, pill CTAs, one dramatic aubergine inversion.',
-    swatches: ['#f3f1ed', '#302023', '#181011', '#d8d4d4'],
-    bg: '#f3f1ed',
-    fg: '#181011',
-  },
-  {
-    slug: 'caldera',
-    name: 'Caldera',
-    tag: 'design3',
-    desc: 'Molten limestone. Warm canvas flooded with ember orange, ultrabold compressed display type, big radii.',
-    swatches: ['#e2e2df', '#fc5000', '#524ae9', '#f5f28e'],
-    bg: '#e2e2df',
-    fg: '#070607',
-  },
-  {
-    slug: 'atlantic',
-    name: 'Atlantic.vc',
-    tag: 'design4',
-    desc: 'Midnight wireframe. Layered charcoals, ice-white type as borders, electric-blue highlights, particle hero.',
-    swatches: ['#000000', '#1f58f2', '#d8eaff', '#ff4105'],
-    bg: '#0d0d0f',
-    fg: '#d8eaff',
-  },
+import Layout from '../layouts/Layout.astro';
+import '../styles/orrery.css';
+import { profile } from '../data/profile';
+import { hub } from '../data/hub';
+import { getProjects, getSortedWriting, formatDateShort } from '../lib/content';
+
+const projects = getProjects().slice(0, hub.limits.projects);
+const posts = (await getSortedWriting()).slice(0, hub.limits.writing);
+const principles = hub.principles.slice(0, hub.limits.principles);
+
+const year = new Date().getFullYear();
+
+/** Flags leftover placeholder copy so it is impossible to ship by accident. */
+const todo = (value: string) => (value.trimStart().startsWith('TODO') ? 'is-todo' : '');
+
+/** Satellite metadata by id, so markup order and grid order stay independent. */
+const sat = (id: string) => {
+  const found = hub.satellites.find((s) => s.id === id);
+  if (!found) throw new Error(`Orrery: no satellite defined with id "${id}"`);
+  return found;
+};
+
+const work = sat('work');
+const writing = sat('writing');
+const method = sat('method');
+const elsewhere = sat('elsewhere');
+
+const fontLinks = [
+  'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&display=swap',
 ];
 ---
 
 <Layout
-  title="Portfolio drafts — pick a design"
-  fontLinks={[
-    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap',
-  ]}
+  title={`${profile.name} — ${profile.role}`}
+  description={profile.tagline}
+  bodyClass="orrery"
+  fontLinks={fontLinks}
 >
-  <main class="chooser">
-    <header>
-      <p class="kicker">Building in public · design drafts</p>
-      <h1>Four takes on the same portfolio.</h1>
-      <p class="lede">
-        Each draft renders the same content — a long-form writing feed and a
-        projects list — in a different design system from <code>skills/</code>.
-        Open each and pick the one that feels like you.
-      </p>
-    </header>
+  <div class="orrery-page">
+    <div class="system">
+      <!-- ── 01 · What I build ─────────────────────────────────────────── -->
+      <section class={`sat sat--${work.id}`} data-edge={work.edge} aria-labelledby="sat-work">
+        <header class="sat__head">
+          <h2 class="sat__label" id="sat-work">{work.label}</h2>
+          <span class="sat__index">{work.index}</span>
+        </header>
 
-    <ul class="grid">
-      {
-        designs.map((d) => (
-          <li>
-            <a href={`/${d.slug}`} style={`--card-bg:${d.bg};--card-fg:${d.fg}`}>
-              <div class="preview">
-                <div class="swatches">
-                  {d.swatches.map((s) => (
-                    <span style={`background:${s}`} />
-                  ))}
+        <ul class="rows">
+          {
+            projects.map((p) => (
+              <li>
+                <a class="row" href={p.url}>
+                  <span class="row__top">
+                    <span class="row__title">{p.name}</span>
+                    <span class={`pill ${p.status === 'Building' ? 'pill--live' : ''}`}>
+                      {p.status}
+                    </span>
+                    <span class="row__meta">{p.year}</span>
+                  </span>
+                  <p class="row__blurb">{p.blurb}</p>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <!-- ── 02 · What I write ─────────────────────────────────────────── -->
+      <section
+        class={`sat sat--${writing.id}`}
+        data-edge={writing.edge}
+        aria-labelledby="sat-writing"
+      >
+        <header class="sat__head">
+          <h2 class="sat__label" id="sat-writing">{writing.label}</h2>
+          <span class="sat__index">{writing.index}</span>
+        </header>
+
+        <ul class="rows">
+          {
+            posts.map((post) => (
+              <li>
+                <div class="row">
+                  <span class="row__top">
+                    <span class="row__title">{post.data.title}</span>
+                    <span class="row__meta">{formatDateShort(post.data.date)}</span>
+                  </span>
+                  <p class="row__blurb">{post.data.excerpt}</p>
                 </div>
-                <span class="name">{d.name}</span>
-              </div>
-              <div class="body">
-                <span class="tag">{d.tag}</span>
-                <p>{d.desc}</p>
-                <span class="go">View draft →</span>
-              </div>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <!-- ── The hub ───────────────────────────────────────────────────── -->
+      <div class="hub">
+        <p class="hub__eyebrow">{profile.location}</p>
+        <h1 class="hub__name">{profile.name}</h1>
+        <p class="hub__role">{profile.role}</p>
+
+        <p class={`hub__now ${todo(hub.now)}`}>
+          {hub.now}
+          <span class={`hub__stamp ${todo(hub.nowUpdated)}`}>Now · {hub.nowUpdated}</span>
+        </p>
+      </div>
+
+      <!-- ── 03 · How I work ───────────────────────────────────────────── -->
+      <section
+        class={`sat sat--${method.id}`}
+        data-edge={method.edge}
+        aria-labelledby="sat-method"
+      >
+        <header class="sat__head">
+          <h2 class="sat__label" id="sat-method">{method.label}</h2>
+          <span class="sat__index">{method.index}</span>
+        </header>
+
+        <ul class="creed">
+          {principles.map((line) => <li class={todo(line)}>{line}</li>)}
+        </ul>
+      </section>
+
+      <!-- ── 04 · Elsewhere ────────────────────────────────────────────── -->
+      <section
+        class={`sat sat--${elsewhere.id}`}
+        data-edge={elsewhere.edge}
+        aria-labelledby="sat-elsewhere"
+      >
+        <header class="sat__head">
+          <h2 class="sat__label" id="sat-elsewhere">{elsewhere.label}</h2>
+          <span class="sat__index">{elsewhere.index}</span>
+        </header>
+
+        <ul class="links">
+          {
+            profile.socials.map((s) => (
+              <li>
+                <a href={s.url}>
+                  <span class="links__label">{s.label}</span>
+                  <span class="links__handle">{s.handle}</span>
+                </a>
+              </li>
+            ))
+          }
+          <li>
+            <a href={`mailto:${profile.email}`} class={todo(profile.email)}>
+              <span class="links__label">Email</span>
+              <span class="links__handle">{profile.email}</span>
             </a>
           </li>
-        ))
-      }
-    </ul>
-  </main>
-</Layout>
+        </ul>
+      </section>
+    </div>
 
-<style>
-  .chooser {
-    font-family: 'Inter', system-ui, sans-serif;
-    background: #f7f7f8;
-    color: #16161a;
-    min-height: 100vh;
-    padding: 72px 24px 96px;
-  }
-  header {
-    max-width: 720px;
-    margin: 0 auto 56px;
-  }
-  .kicker {
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    font-size: 12px;
-    color: #6b6b72;
-    margin: 0 0 16px;
-  }
-  h1 {
-    font-size: clamp(32px, 5vw, 48px);
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-    margin: 0 0 16px;
-  }
-  .lede {
-    font-size: 18px;
-    line-height: 1.6;
-    color: #4a4a52;
-    margin: 0;
-  }
-  .lede code {
-    background: #e9e9ec;
-    padding: 1px 6px;
-    border-radius: 4px;
-    font-size: 15px;
-  }
-  .grid {
-    max-width: 960px;
-    margin: 0 auto;
-    list-style: none;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
-  }
-  .grid a {
-    display: block;
-    text-decoration: none;
-    color: inherit;
-    border-radius: 16px;
-    overflow: hidden;
-    border: 1px solid #e4e4e8;
-    background: #fff;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-  }
-  .grid a:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-  }
-  .preview {
-    background: var(--card-bg);
-    color: var(--card-fg);
-    padding: 28px;
-    min-height: 140px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  .swatches {
-    display: flex;
-    gap: 8px;
-  }
-  .swatches span {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 1px solid rgba(128, 128, 128, 0.35);
-  }
-  .preview .name {
-    font-size: 28px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-  }
-  .body {
-    padding: 24px 28px 28px;
-  }
-  .tag {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #8a8a90;
-  }
-  .body p {
-    margin: 10px 0 18px;
-    color: #4a4a52;
-    line-height: 1.55;
-  }
-  .go {
-    font-weight: 600;
-    font-size: 15px;
-  }
-  @media (max-width: 720px) {
-    .grid {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>
+    <footer class="orrery-foot">
+      <span>{profile.wordmark} · {year}</span>
+      <a href="/drafts">Earlier drafts →</a>
+    </footer>
+  </div>
+</Layout>

@@ -1,0 +1,495 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Orrery — a hub-and-satellite personal page.
+
+   An orrery is a clockwork model of a solar system: one body at the centre,
+   the rest arranged around it and visibly connected to it. That is the whole
+   idea here. You are the hub. Every satellite is one facet of you, joined to
+   the centre by a hairline so the relationship is literal, not implied.
+
+   Retheming: every colour, rule and rhythm value lives in :root below. You
+   should be able to change the entire feel of the page without leaving that
+   block.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Palette — warm paper, near-black ink, one deep green accent.
+     Chosen to sit apart from the four earlier drafts (electric blue, aubergine,
+     ember orange, midnight blue). */
+  --bg: #fbfaf8;
+  --ink: #14130f;
+  --ink-soft: #45423b;
+  --muted: #78746a;
+  --rule: #ddd8ce;
+  --rule-strong: #c3bcae;
+  --panel: #ffffff;
+  --accent: #1c6b58;
+  --accent-soft: #e8f0ec;
+
+  /* Rhythm */
+  --gap: 28px;
+  --pad: 26px;
+  --radius: 3px;
+  --maxw: 1080px;
+
+  /* Type */
+  --display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --dur: 260ms;
+  --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e0e0c;
+    --ink: #efece4;
+    --ink-soft: #c4bfb4;
+    --muted: #8d887d;
+    --rule: #2b2a25;
+    --rule-strong: #423f38;
+    --panel: #151511;
+    --accent: #57b89a;
+    --accent-soft: #16221d;
+  }
+}
+
+body.orrery {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.orrery-page {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: clamp(28px, 6vh, 72px) clamp(18px, 4vw, 40px);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+/* ── The system: satellites above, hub across the middle, satellites below ───
+   Grid areas mirror the shape exactly, so reordering satellites is a one-line
+   change here rather than a reshuffle of the markup. */
+
+.system {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    'work    writing'
+    'hub     hub'
+    'method  elsewhere';
+  gap: var(--gap);
+  flex: 1;
+  align-content: center;
+}
+
+.sat--work {
+  grid-area: work;
+}
+.sat--writing {
+  grid-area: writing;
+}
+.sat--method {
+  grid-area: method;
+}
+.sat--elsewhere {
+  grid-area: elsewhere;
+}
+.hub {
+  grid-area: hub;
+}
+
+/* ── Hub ─────────────────────────────────────────────────────────────────── */
+
+.hub {
+  position: relative;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  background: var(--panel);
+  padding: clamp(30px, 5vw, 52px) clamp(24px, 5vw, 56px);
+  text-align: center;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* A very faint orbital ring behind the hub. It is the one decorative element
+   on the page; delete this rule and nothing else breaks. */
+.hub::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  width: 150%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border: 1px dashed var(--rule);
+  border-radius: 50%;
+  opacity: 0.55;
+  animation: hub-orbit 140s linear infinite;
+}
+
+@keyframes hub-orbit {
+  to {
+    rotate: 360deg;
+  }
+}
+
+.hub__eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 clamp(16px, 3vw, 26px);
+}
+
+.hub__name {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(46px, 11vw, 108px);
+  line-height: 0.94;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.hub__role {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: clamp(14px, 2.5vw, 22px) 0 0;
+}
+
+/* The "now" line — the closest thing the page has to a thesis. */
+.hub__now {
+  margin: clamp(22px, 4vw, 34px) auto 0;
+  max-width: 52ch;
+  padding-top: clamp(20px, 3vw, 28px);
+  border-top: 1px solid var(--rule);
+  font-family: var(--display);
+  font-size: clamp(19px, 2.4vw, 26px);
+  font-style: italic;
+  line-height: 1.42;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+.hub__stamp {
+  display: block;
+  margin-top: 14px;
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ── Satellites ──────────────────────────────────────────────────────────── */
+
+.sat {
+  position: relative;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: transparent;
+  padding: var(--pad);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.sat:hover {
+  border-color: var(--rule-strong);
+  background: var(--panel);
+}
+
+/* The connector: a hairline from the satellite to the hub, spanning the gap.
+   Top-row satellites drop a line down; bottom-row satellites send one up.
+   No JS and no measurement — the line is exactly one gap tall. */
+.sat::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  width: 1px;
+  height: var(--gap);
+  background: var(--rule);
+  transition: background var(--dur) var(--ease);
+}
+
+.sat[data-edge='top']::after {
+  top: 100%;
+}
+.sat[data-edge='bottom']::after {
+  bottom: 100%;
+}
+
+.sat:hover::after {
+  background: var(--accent);
+}
+
+.sat__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.sat__label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: 0;
+}
+
+.sat__index {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+/* ── Lists inside satellites ─────────────────────────────────────────────── */
+
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.rows > li + li {
+  border-top: 1px solid var(--rule);
+}
+
+.row {
+  display: block;
+  padding: 13px 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+.row:first-child {
+  padding-top: 2px;
+}
+
+.row__top {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.row__title {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  transition: color var(--dur) var(--ease);
+}
+
+a.row:hover .row__title {
+  color: var(--accent);
+}
+
+.row__meta {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.row__blurb {
+  margin: 5px 0 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+/* Status pill — tiny, mono, borrowed from the instrument-panel register. */
+.pill {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.pill--live {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* Numbered principles — the "how I work" satellite. */
+.creed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: creed;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.creed li {
+  counter-increment: creed;
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+.creed li::before {
+  content: counter(creed, decimal-leading-zero);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  padding-top: 3px;
+}
+
+/* Outbound links — the "elsewhere" satellite. */
+.links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.links > li + li {
+  border-top: 1px solid var(--rule);
+}
+
+.links a {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 12px 0;
+  text-decoration: none;
+  color: inherit;
+  transition: color var(--dur) var(--ease);
+}
+
+.links a:first-child {
+  padding-top: 2px;
+}
+
+.links a:hover {
+  color: var(--accent);
+}
+
+.links__label {
+  font-size: 14.5px;
+  font-weight: 500;
+}
+
+.links__handle {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.links a:hover .links__handle {
+  color: var(--accent);
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+
+.orrery-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.orrery-foot a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--dur) var(--ease);
+}
+
+.orrery-foot a:hover {
+  color: var(--accent);
+}
+
+/* ── Placeholder marker ──────────────────────────────────────────────────────
+   Anything still carrying a `TODO —` string gets flagged visually so it cannot
+   be shipped by accident. Remove this rule once the content is real. */
+
+.is-todo {
+  outline: 1px dashed #c2410c;
+  outline-offset: 3px;
+  background: rgba(194, 65, 12, 0.06);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────────
+   Below 760px the system collapses to one column with the hub first: on a
+   phone, identity should arrive before any of its facets. Connectors are
+   dropped because a vertical stack already reads as connected. */
+
+@media (max-width: 760px) {
+  .system {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'hub'
+      'work'
+      'writing'
+      'method'
+      'elsewhere';
+  }
+
+  .sat::after {
+    display: none;
+  }
+
+  .hub::before {
+    width: 220%;
+  }
+
+  .orrery-foot {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hub::before {
+    animation: none;
+  }
+  * {
+    transition-duration: 1ms !important;
+  }
+}
