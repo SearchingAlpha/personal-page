@@ -7,6 +7,7 @@
 // Geometry, motion and depth are all CSS — see ../styles/rutherford.css.
 // Which electrons exist lives in ../data/atom.ts.
 import Layout from '../layouts/Layout.astro';
+import Feynman from '../components/Feynman.astro';
 import '../styles/rutherford.css';
 import { profile } from '../data/profile';
 import { orbits, electrons, plate, electronIndex } from '../data/atom';
@@ -47,6 +48,8 @@ const [nameFirst, ...nameRest] = profile.name.split(' ');
   fontLinks={FONT_LINKS}
 >
   <div class="plate">
+    <!-- The particle field: a cellular automaton, drawn by the script below. -->
+    <canvas class="field" aria-hidden="true"></canvas>
     <span class="corners" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
 
     <header class="plate__head">
@@ -99,6 +102,18 @@ const [nameFirst, ...nameRest] = profile.name.split(' ');
           {electrons.length} electrons. Observed {observed}.
         </figcaption>
       </figure>
+
+      <!-- Doodles in the margin. Only the first two are placed. -->
+      {
+        plate.marginalia.slice(0, 2).map((m, i) => (
+          <figure class={`marginalia marginalia--${i}`}>
+            <Feynman kind={m.kind} />
+            <figcaption class="marginalia__cap">
+              Fig. {i + 2} · {m.caption}
+            </figcaption>
+          </figure>
+        ))
+      }
     </main>
 
     <footer class="plate__foot">
@@ -140,3 +155,215 @@ const [nameFirst, ...nameRest] = profile.name.split(' ');
     </footer>
   </div>
 </Layout>
+
+<script>
+  // ── The field ──────────────────────────────────────────────────────────────
+  // A cellular automaton behind the plate: von Neumann's idea, Conway's rule.
+  // Cells sit on a lattice of faint dots; live ones glow cobalt and ease in
+  // and out rather than blink. The figure sits in a clearing. Moving the
+  // pointer disturbs the vacuum and births cells. This is the only script on
+  // the site, and the page is complete without it.
+
+  const PITCH = 18; // px between lattice points
+  const DENSITY = 0.14; // initial live fraction
+  const STEP_MS = 640; // one generation
+  const EASE = 0.1; // glow easing per frame
+  const FLOOR = 0.06; // live fraction below which the vacuum fluctuates
+  const COBALT = '31,88,242';
+  const ICE = '216,234,255';
+
+  const canvas = document.querySelector<HTMLCanvasElement>('.field');
+  const plate = canvas?.closest<HTMLElement>('.plate');
+  const atom = document.querySelector<HTMLElement>('.atom');
+  const ctx = canvas?.getContext('2d');
+  if (canvas && plate && atom && ctx) run(canvas, plate, atom, ctx);
+
+  function run(
+    canvas: HTMLCanvasElement,
+    plate: HTMLElement,
+    atom: HTMLElement,
+    ctx: CanvasRenderingContext2D,
+  ) {
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let w = 0;
+    let h = 0;
+    let cols = 0;
+    let rows = 0;
+    let cells = new Uint8Array(0);
+    let next = new Uint8Array(0);
+    let glow = new Float32Array(0);
+    let fall = new Float32Array(0); // 0 inside the clearing → 1 at full density
+    let lattice: HTMLCanvasElement | null = null;
+    let dirty = true;
+
+    // Quantised fill styles, so the draw loop allocates no strings.
+    const LEVELS = 16;
+    const live = Array.from({ length: LEVELS + 1 }, (_, i) => `rgba(${COBALT},${(0.18 + 0.62 * (i / LEVELS)).toFixed(3)})`);
+
+    function setup() {
+      const r = plate.getBoundingClientRect();
+      w = r.width;
+      h = r.height;
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      cols = Math.ceil(w / PITCH);
+      rows = Math.ceil(h / PITCH);
+      const n = cols * rows;
+      cells = new Uint8Array(n);
+      next = new Uint8Array(n);
+      glow = new Float32Array(n);
+      fall = new Float32Array(n);
+
+      // The clearing: nothing within half an atom of its centre, full field
+      // beyond three quarters.
+      const a = atom.getBoundingClientRect();
+      const cx = a.left - r.left + a.width / 2;
+      const cy = a.top - r.top + a.height / 2;
+      const r0 = a.width * 0.48;
+      const r1 = a.width * 0.78;
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          const d = Math.hypot(x * PITCH + PITCH / 2 - cx, y * PITCH + PITCH / 2 - cy);
+          fall[y * cols + x] = Math.min(1, Math.max(0, (d - r0) / (r1 - r0)));
+        }
+      }
+
+      for (let k = 0; k < n; k++) {
+        cells[k] = Math.random() < DENSITY ? 1 : 0;
+        glow[k] = cells[k];
+      }
+
+      // The dead lattice never changes: draw it once.
+      lattice = document.createElement('canvas');
+      lattice.width = canvas.width;
+      lattice.height = canvas.height;
+      const lc = lattice.getContext('2d')!;
+      lc.setTransform(dpr, 0, 0, dpr, 0, 0);
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          const f = fall[y * cols + x];
+          if (f < 0.02) continue;
+          lc.fillStyle = `rgba(${ICE},${(0.09 * f).toFixed(3)})`;
+          lc.fillRect(x * PITCH + PITCH / 2 - 0.5, y * PITCH + PITCH / 2 - 0.5, 1, 1);
+        }
+      }
+      dirty = true;
+    }
+
+    function step() {
+      if (document.hidden) return;
+      let pop = 0;
+      for (let y = 0; y < rows; y++) {
+        const up = ((y + rows - 1) % rows) * cols;
+        const mid = y * cols;
+        const dn = ((y + 1) % rows) * cols;
+        for (let x = 0; x < cols; x++) {
+          const l = (x + cols - 1) % cols;
+          const rr = (x + 1) % cols;
+          const n =
+            cells[up + l] + cells[up + x] + cells[up + rr] +
+            cells[mid + l] + cells[mid + rr] +
+            cells[dn + l] + cells[dn + x] + cells[dn + rr];
+          const alive = cells[mid + x] ? n === 2 || n === 3 : n === 3;
+          next[mid + x] = alive ? 1 : 0;
+          pop += next[mid + x];
+        }
+      }
+      [cells, next] = [next, cells];
+      // Life left alone settles into still lifes. A quiet field gets a
+      // fluctuation somewhere, so it never quite goes out.
+      if (pop < cells.length * FLOOR) {
+        sprinkle(Math.floor(Math.random() * cols), Math.floor(Math.random() * rows), 3, 0.6);
+      }
+      dirty = true;
+    }
+
+    function sprinkle(cx: number, cy: number, radius: number, p: number) {
+      for (let dy = -radius; dy <= radius; dy++) {
+        for (let dx = -radius; dx <= radius; dx++) {
+          if (dx * dx + dy * dy > radius * radius) continue;
+          const x = (cx + dx + cols) % cols;
+          const y = (cy + dy + rows) % rows;
+          if (Math.random() < p) cells[y * cols + x] = 1;
+        }
+      }
+      dirty = true;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      if (lattice) ctx.drawImage(lattice, 0, 0, w, h);
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          const k = y * cols + x;
+          const g = glow[k] * fall[k];
+          if (g < 0.03) continue;
+          ctx.fillStyle = live[Math.round(g * LEVELS)];
+          const s = 1.2 + 1.6 * g;
+          ctx.fillRect(x * PITCH + PITCH / 2 - s / 2, y * PITCH + PITCH / 2 - s / 2, s, s);
+        }
+      }
+    }
+
+    function frame() {
+      let moving = false;
+      for (let k = 0; k < cells.length; k++) {
+        const d = cells[k] - glow[k];
+        if (Math.abs(d) > 0.004) {
+          glow[k] += d * EASE;
+          moving = true;
+        } else {
+          glow[k] = cells[k];
+        }
+      }
+      if (moving || dirty) {
+        draw();
+        dirty = false;
+      }
+      requestAnimationFrame(frame);
+    }
+
+    setup();
+
+    if (still) {
+      // One generation, held. No timers, no pointer.
+      draw();
+      return;
+    }
+
+    requestAnimationFrame(frame);
+    setInterval(step, STEP_MS);
+
+    let lastCell = -1;
+    plate.addEventListener(
+      'pointermove',
+      (e) => {
+        const r = plate.getBoundingClientRect();
+        const x = Math.floor((e.clientX - r.left) / PITCH);
+        const y = Math.floor((e.clientY - r.top) / PITCH);
+        const k = y * cols + x;
+        if (k === lastCell || x < 0 || y < 0 || x >= cols || y >= rows) return;
+        lastCell = k;
+        if (fall[k] > 0.05) sprinkle(x, y, 1, 0.45);
+      },
+      { passive: true },
+    );
+
+    // Reseed on resize. The observer also fires once on observe(); skip that,
+    // or the field would visibly reseed right after it first appears.
+    let timer: ReturnType<typeof setTimeout>;
+    let first = true;
+    new ResizeObserver(() => {
+      if (first) {
+        first = false;
+        return;
+      }
+      clearTimeout(timer);
+      timer = setTimeout(setup, 150);
+    }).observe(plate);
+  }
+</script>

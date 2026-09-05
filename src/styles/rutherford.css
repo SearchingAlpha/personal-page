@@ -149,6 +149,24 @@ body.rutherford :is(h1, h2, h3, strong, b) {
   min-height: calc(100svh - 2 * var(--frame));
 }
 
+/* The particle field lies under everything on the plate. */
+.field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.plate > .corners,
+.plate__head,
+.stage,
+.plate__foot {
+  position: relative;
+  z-index: 1;
+}
+
 .plate__head {
   display: flex;
   justify-content: space-between;
@@ -167,6 +185,12 @@ body.rutherford :is(h1, h2, h3, strong, b) {
   display: grid;
   place-items: center;
   min-height: 0;
+}
+
+/* The figure sits above the marginalia, which are positioned within .stage. */
+.figure {
+  position: relative;
+  z-index: 1;
 }
 
 /* Sized so head, caption and foot still fit beside it on a 720px-tall laptop. */
@@ -192,6 +216,70 @@ body.rutherford :is(h1, h2, h3, strong, b) {
   width: 100%;
   aspect-ratio: 1;
   container-type: inline-size;
+}
+
+/* ── Marginalia ────────────────────────────────────────────────────────────
+   Feynman diagrams doodled in the margins of the stage, bottom-left and
+   top-right, numbered on from the atom. Line-work only, at the plate's
+   hairline weight; they vanish where there is no margin to doodle in. */
+
+.marginalia {
+  position: absolute;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 150px;
+}
+
+.marginalia--0 {
+  left: 3%;
+  bottom: 6%;
+}
+
+.marginalia--1 {
+  right: 3%;
+  top: 6%;
+}
+
+.marginalia__cap {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.feynman {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.feynman__lines path,
+.feynman__lines circle {
+  fill: none;
+  stroke: var(--ice);
+  stroke-opacity: 0.55;
+  stroke-width: 1;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.feynman__arrows polygon {
+  fill: var(--ice);
+  fill-opacity: 0.7;
+}
+
+.feynman__vertices circle {
+  fill: var(--accent);
+}
+
+@media (max-width: 1100px), (max-height: 640px) {
+  .marginalia {
+    display: none;
+  }
 }
 
 /* ── Rings ─────────────────────────────────────────────────────────────────
