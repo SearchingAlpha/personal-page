@@ -27,6 +27,45 @@ export function formatDate(date: Date): string {
   });
 }
 
+export function formatMonthYear(date: Date): string {
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+}
+
+/** One line of the letter's "Recently" list. */
+export interface RecentItem {
+  date: Date;
+  /** How the date reads in the list: "Aug 2026" for an essay, "2026" for a project. */
+  when: string;
+  title: string;
+  /** What it is, lower-case: "essay", or a project's status ("building", "shipped"…). */
+  kind: string;
+  href: string;
+}
+
+/**
+ * The newest things across the site, essays and projects together. Projects
+ * carry only a year, so each is dated to the middle of its year: a year's
+ * essays then sort naturally around it. Links go to the section pages, since
+ * essays have no pages of their own yet.
+ */
+export async function getRecent(limit = 4): Promise<RecentItem[]> {
+  const essays: RecentItem[] = (await getSortedWriting()).map((p) => ({
+    date: p.data.date,
+    when: formatMonthYear(p.data.date),
+    title: p.data.title,
+    kind: 'essay',
+    href: '/writing',
+  }));
+  const work: RecentItem[] = projects.map((p) => ({
+    date: new Date(p.year, 6, 1),
+    when: p.when ?? String(p.year),
+    title: p.name,
+    kind: p.status.toLowerCase(),
+    href: '/projects',
+  }));
+  return [...essays, ...work].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, limit);
+}
+
 export function formatDateShort(date: Date): string {
   return date.toLocaleDateString('en-US', {
     year: 'numeric',

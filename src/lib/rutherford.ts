@@ -33,6 +33,4 @@ export function electronStyle(orbit: Orbit, e: Electron): string {
   ].join(';');
 }
 
-/** Flags leftover placeholder copy so it cannot ship unnoticed. */
-export const todoClass = (value: string) =>
-  value.trimStart().startsWith('TODO') ? 'is-todo' : '';
+export { todoClass } from './todo';

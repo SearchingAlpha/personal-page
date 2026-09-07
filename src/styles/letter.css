@@ -1,0 +1,891 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   The letter — the site as a short letter on warm paper.
+
+   The home page is one paragraph in the first person. The sections of the
+   site are links inside its sentences, each with its count as a small
+   superscript; under it, the dated "now" line in italics and a short list of
+   what is newest. The section pages are the same sheet with a title and a
+   column of entries.
+
+   Rules:
+   - One serif for everything that is prose (Newsreader). Headings are never
+     bold: size and italics carry the hierarchy. Bold (600) is for the few
+     words inside a line that matter most. Inter, small and tracked, for
+     labels only: dates, counts, header, footer.
+   - Warm off-white paper, near-black ink, one rust accent. The accent marks
+     what can be followed (underlines, reference numbers) and what is live.
+   - Every link in the body is a numbered reference — see "References".
+   - Hairlines, no boxes, no shadows.
+   - The first opening types the greeting and lets the rest of the letter
+     ease in around it (src/scripts/letter-intro.ts); see "The intro" below.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --paper: #fbf9f4;
+  --ink: #1c1a17;
+  --ink-soft: #3d3833;
+  --muted: #77716a;
+  --hair: #e3ded4;
+  --rust: #b3401e;
+
+  --bg: var(--paper);
+  --accent: var(--rust);
+
+  --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  --gutter: clamp(20px, 4vw, 40px);
+  --measure: 660px;
+
+  --dur: 220ms;
+  --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+
+body.letter {
+  color-scheme: light;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 1.5;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Headings are never bold; the hierarchy is size and italics. Bold is kept
+   for emphasis inside a line — the words that matter most. */
+body.letter :is(h1, h2, h3) {
+  font-weight: 400;
+}
+
+body.letter :is(strong, b) {
+  font-weight: 600;
+}
+
+body.letter a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--dur) var(--ease);
+}
+
+/* The label register: small, sans, tracked, upper-case. */
+.card__tags,
+.top,
+.foot,
+.now__stamp,
+.recently__head,
+.recently__date,
+.topic__back,
+.topic__nav,
+.topic__index,
+.topic__foot,
+.row__meta,
+.row__posts,
+.pill,
+.creed li::before,
+.part__head,
+.stack__theme {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── The sheet ─────────────────────────────────────────────────────────────── */
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 28px var(--gutter);
+  color: var(--muted);
+}
+
+.top a {
+  color: var(--ink);
+}
+
+.top a:hover {
+  color: var(--accent);
+}
+
+.page {
+  width: min(var(--measure), calc(100% - 2 * var(--gutter)));
+  margin: 0 auto;
+  padding: clamp(40px, 9vh, 84px) 0 48px;
+  flex: 1;
+}
+
+.foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  padding: 24px var(--gutter);
+  color: var(--muted);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  font-size: 13px;
+}
+
+.foot nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+}
+
+.foot a {
+  color: var(--ink);
+}
+
+.foot a:hover {
+  color: var(--accent);
+}
+
+/* ── The letter ────────────────────────────────────────────────────────────── */
+
+.lead {
+  margin: 0;
+  font-size: clamp(26px, 3.6vw, 34px);
+  line-height: 1.32;
+  letter-spacing: -0.012em;
+  text-wrap: pretty;
+}
+
+.lead a {
+  border-bottom: 1.5px solid var(--accent);
+  padding-bottom: 1px;
+}
+
+.lead a:hover {
+  color: var(--accent);
+}
+
+/* ── References ────────────────────────────────────────────────────────────
+   Every link in the body of a page is a reference: its text, then a small
+   ordinal in the accent, like a footnote mark. The numbers run in reading
+   order through the whole page — the letter's links first, then the list
+   under it; on a section page, the entries top to bottom — and count
+   internal and external destinations alike. The header, the section nav and
+   the footer are navigation, not references, and carry none. The number is
+   a CSS counter, so it is never typed by hand and can never fall out of
+   order. In Astro, `class="ref"` on the <a>; in the data files, [text](url)
+   (src/lib/refs.ts). See DESIGN.md. */
+
+.page,
+.topic__body {
+  counter-reset: ref;
+}
+
+.ref::after {
+  counter-increment: ref;
+  content: counter(ref);
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 0;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+  vertical-align: super;
+  margin-left: 3px;
+}
+
+.now {
+  margin: 30px 0 0;
+  font-size: clamp(19px, 2.4vw, 22px);
+  line-height: 1.45;
+  font-style: italic;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+.now__stamp {
+  font-style: normal;
+  font-weight: 400;
+  color: var(--muted);
+  margin-left: 10px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* ── Recently ─────────────────────────────────────────────────────────────── */
+
+.recently__head {
+  margin: 72px 0 12px;
+  color: var(--muted);
+}
+
+.recently ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--hair);
+}
+
+.recently li {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--hair);
+  font-size: 18px;
+}
+
+.recently__date {
+  flex: none;
+  width: 78px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--muted);
+}
+
+.recently__title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.recently__title:hover {
+  color: var(--accent);
+}
+
+.recently__kind {
+  margin-left: auto;
+  flex: none;
+  font-size: 16px;
+  font-style: italic;
+  color: var(--muted);
+}
+
+@media (max-width: 520px) {
+  .recently li {
+    flex-wrap: wrap;
+    gap: 4px 14px;
+  }
+  .recently__date {
+    width: auto;
+  }
+  .recently__title {
+    flex-basis: 100%;
+    order: 1;
+  }
+  .recently__kind {
+    margin-left: 0;
+    font-size: 15px;
+  }
+}
+
+/* ── The intro ─────────────────────────────────────────────────────────────
+   html.intro: the sheet is blank. The script empties the greeting (.lead__hi),
+   marks it .is-typing — visible, with a caret — and types it back. Once it is
+   whole (.is-typed) the caret goes; html.intro-reveal then eases the rest of
+   the letter in, in reading order. Both html classes go once the reveal is
+   done. Without the script, html.intro is never set and the page is complete. */
+
+html.intro .lead__hi {
+  opacity: 0;
+}
+
+html.intro .lead__hi.is-typing {
+  opacity: 1;
+}
+
+html.intro .lead__hi.is-typing::after {
+  content: '';
+  display: inline-block;
+  width: 0.06em;
+  height: 0.9em;
+  margin-left: 0.08em;
+  vertical-align: -0.08em;
+  background: var(--accent);
+  animation: caret 1s steps(1) infinite;
+}
+
+html.intro .lead__hi.is-typed::after {
+  display: none;
+}
+
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+html.intro :is(.lead__rest, .now, .recently, .top, .foot) {
+  opacity: 0;
+}
+
+html.intro :is(.now, .recently) {
+  translate: 0 6px;
+}
+
+html.intro-reveal .lead__rest {
+  opacity: 1;
+  transition: opacity 0.7s var(--ease);
+}
+
+html.intro-reveal .now {
+  opacity: 1;
+  translate: 0 0;
+  transition: opacity 0.6s var(--ease) 0.35s, translate 0.6s var(--ease) 0.35s;
+}
+
+html.intro-reveal .recently {
+  opacity: 1;
+  translate: 0 0;
+  transition: opacity 0.6s var(--ease) 0.6s, translate 0.6s var(--ease) 0.6s;
+}
+
+html.intro-reveal :is(.top, .foot) {
+  opacity: 1;
+  transition: opacity 0.6s var(--ease) 0.85s;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Section pages — the same sheet, with a title and a column of entries.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* A wide page (grids of cards) loosens the measure; the prose inside keeps
+   its own width through the columns. */
+.topic--wide {
+  --measure: 1080px;
+}
+
+.topic {
+  width: min(var(--measure), calc(100% - 2 * var(--gutter)));
+  margin: 0 auto;
+  padding: clamp(28px, 6vh, 56px) 0 48px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(32px, 6vh, 56px);
+}
+
+.topic__head {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.topic__bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+}
+
+.topic__back {
+  color: var(--muted);
+}
+
+.topic__back:hover {
+  color: var(--accent);
+}
+
+/* The other sections, with this one standing in ink among them. */
+.topic__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  color: var(--muted);
+}
+
+.topic__nav a:hover {
+  color: var(--accent);
+}
+
+.topic__nav [aria-current] {
+  color: var(--ink);
+}
+
+.topic__index {
+  margin: 0 0 12px;
+  color: var(--muted);
+}
+
+.topic__title {
+  margin: 0;
+  font-size: clamp(40px, 7vw, 60px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.topic__body {
+  flex: 1;
+}
+
+.topic__foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding-top: 18px;
+  border-top: 1px solid var(--hair);
+  color: var(--muted);
+}
+
+.topic__foot-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+}
+
+.topic__foot a:hover {
+  color: var(--accent);
+}
+
+/* ── Entries ───────────────────────────────────────────────────────────── */
+
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rows > li {
+  padding: 18px 0;
+}
+
+.rows > li:first-child {
+  padding-top: 0;
+}
+
+.rows > li + li {
+  border-top: 1px solid var(--hair);
+}
+
+.row {
+  display: block;
+}
+
+.row__top {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.row__title {
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  transition: color var(--dur) var(--ease);
+}
+
+a.row__title:hover {
+  color: var(--accent);
+}
+
+.row__meta {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.row__blurb {
+  margin: 6px 0 0;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+/* The specifics under the summary: one line each, a dash for a marker. */
+.row__points {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row__points li {
+  position: relative;
+  padding-left: 22px;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+.row__points li::before {
+  content: '–';
+  position: absolute;
+  left: 0;
+  color: var(--muted);
+}
+
+/* ── Project cards ──────────────────────────────────────────────────────────
+   /projects is two grids: the active projects, two to a row, each with a
+   picture; the other projects, three to a row, title and a line. Inside a
+   card the entry pieces (.row__*) are reused as they are. */
+
+.cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 44px 36px;
+}
+
+.cards--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.cards--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.card__figure {
+  margin: 0 0 8px;
+}
+
+.card__img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border: 1px solid var(--hair);
+  background: var(--hair);
+}
+
+.card__credit {
+  margin: 6px 0 0;
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
+
+.card__credit a:hover {
+  color: var(--accent);
+}
+
+/* What kind of thing it is: a few words in the label register. */
+.card__tags {
+  margin: 0;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.card .row__blurb {
+  margin-top: 4px;
+}
+
+@media (max-width: 860px) {
+  .cards--3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .cards--2,
+  .cards--3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── About me: the basics, one fact per line. ─────────────────────────── */
+.facts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.facts li {
+  position: relative;
+  padding-left: 26px;
+  font-size: 19px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+.facts li::before {
+  content: '–';
+  position: absolute;
+  left: 0;
+  color: var(--muted);
+}
+
+/* Further references under the entry: where a project was written about. */
+.row__posts {
+  margin: 12px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  color: var(--muted);
+}
+
+.row__posts a:hover {
+  color: var(--accent);
+}
+
+/* Outlined status — never filled. The live one is the single accent. */
+.pill {
+  font-size: 10.5px;
+  padding: 3px 8px;
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  color: var(--muted);
+  white-space: nowrap;
+  translate: 0 -2px;
+}
+
+.pill--live {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Numbered principles. */
+.creed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: creed;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.creed li {
+  counter-increment: creed;
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 12px;
+  font-size: clamp(22px, 2.6vw, 26px);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+.creed li::before {
+  content: counter(creed, decimal-leading-zero);
+  color: var(--muted);
+  padding-top: 0.55em;
+}
+
+/* Outbound links. */
+.links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.links > li + li {
+  border-top: 1px solid var(--hair);
+}
+
+.links a {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 16px 0;
+}
+
+.links > li:first-child a {
+  padding-top: 0;
+}
+
+.links a:hover {
+  color: var(--accent);
+}
+
+.links__label {
+  font-size: 20px;
+  letter-spacing: -0.01em;
+}
+
+.links__handle {
+  margin-left: auto;
+  font-family: var(--sans);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  transition: color var(--dur) var(--ease);
+}
+
+.links a:hover .links__handle {
+  color: var(--accent);
+}
+
+/* ── Interests ─────────────────────────────────────────────────────────────
+   Two parts on one page, books and podcasts, each with an id the letter links
+   to. The favourites sit on a shelf — a grid of covers, the one place the site
+   shows pictures — and the whole list follows, filed by theme. Podcasts reuse
+   the project rows. */
+
+.part {
+  scroll-margin-top: 24px;
+}
+
+.part + .part {
+  margin-top: 72px;
+}
+
+.part__head {
+  margin: 0 0 14px;
+  color: var(--muted);
+}
+
+/* The count after the part's name, in the accent like the letter's. */
+.part__count {
+  color: var(--accent);
+  margin-left: 6px;
+}
+
+.part__note {
+  margin: 0 0 28px;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+/* The shelf: covers, five to a row at full measure. */
+.shelf {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 26px 16px;
+}
+
+.shelf li {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.shelf__cover {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border: 1px solid var(--hair);
+  background: var(--hair);
+  margin-bottom: 7px;
+}
+
+/* A favourite without an image gets its title set on the cover instead. */
+.shelf__cover--type {
+  display: flex;
+  align-items: flex-end;
+  padding: 10px;
+  font-size: 13px;
+  line-height: 1.25;
+  color: var(--ink-soft);
+  background: var(--paper);
+  text-wrap: balance;
+}
+
+.shelf__title {
+  letter-spacing: -0.005em;
+  text-wrap: pretty;
+}
+
+.shelf__by {
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+/* The whole list, filed by theme. */
+.stack {
+  margin-top: 44px;
+}
+
+.stack__theme {
+  margin: 0 0 8px;
+  color: var(--muted);
+}
+
+.stack ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--hair);
+}
+
+.stack li {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--hair);
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.stack__title {
+  flex: 0 1 auto;
+  letter-spacing: -0.005em;
+}
+
+.stack__by {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 16px;
+  color: var(--muted);
+}
+
+/* The favourites, marked once more where they are filed. */
+.stack__fav {
+  flex: none;
+  margin-left: auto;
+  font-size: 15px;
+  font-style: italic;
+  color: var(--accent);
+}
+
+/* One line on each book, on its own row under title and author. */
+.stack__blurb {
+  flex-basis: 100%;
+  margin: 1px 0 0;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+/* ── Placeholder marker ────────────────────────────────────────────────────
+   Anything still carrying `TODO —` is outlined so it cannot ship by accident.
+   Deliberately outside the palette so it reads as scaffolding, not design.
+   Delete this rule once the content is real. */
+
+.is-todo {
+  outline: 1px dashed #d99e00;
+  outline-offset: 4px;
+  background: rgba(217, 158, 0, 0.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+  }
+}

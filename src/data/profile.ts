@@ -1,6 +1,6 @@
-// ── Personalize here ────────────────────────────────────────────────────────
-// Everything below is placeholder content. Edit this one file to make the
-// drafts your own — every design page reads name/tagline/socials from here.
+// ── Who ─────────────────────────────────────────────────────────────────────
+// Name, role, where, how to reach me. Every page (the letter, the section
+// pages, the drafts) reads these from here.
 
 export interface SocialLink {
   label: string;
@@ -26,16 +26,18 @@ export interface Profile {
 export const profile: Profile = {
   name: 'Pablo',
   wordmark: 'pablo',
-  role: 'Software engineer & indie builder',
+  role: 'Supply chain analyst at Amazon',
   headline: 'Building small things in the open.',
   subline: 'A public log of what I make.',
-  tagline: 'Building small, useful things in public — and writing about how it goes.',
-  bio: "I design and ship side projects out in the open. This is where I keep the log: what I'm making, what broke, and what I learned along the way.",
-  location: 'Remote',
-  email: 'hello@example.com',
+  tagline:
+    'Mechanical engineer turned supply-chain analyst at Amazon, in Luxembourg. Building small, useful things on the side — and writing about how it goes.',
+  bio: "By day I make Amazon's EU supply chain plan with less manual work: Python, SQL, dashboards and lately LLM agents. On the side I ship small projects out in the open. This is where I keep the log: what I'm making, what broke, and what I learned along the way.",
+  location: 'Luxembourg',
+  email: 'morvegpablo@gmail.com',
   socials: [
-    { label: 'GitHub', handle: '@pablo', url: 'https://github.com/' },
-    { label: 'X', handle: '@pablo', url: 'https://x.com/' },
+    { label: 'GitHub', handle: '@SearchingAlpha', url: 'https://github.com/SearchingAlpha' },
+    { label: 'LinkedIn', handle: 'Pablo Moral Vega', url: 'https://www.linkedin.com/in/pablo-moral-vega-5154b9200/' },
+    { label: 'X', handle: '@0xPmoral', url: 'https://x.com/0xPmoral' },
     { label: 'RSS', handle: 'Subscribe', url: '/rss.xml' },
   ],
 };

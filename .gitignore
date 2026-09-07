@@ -11,3 +11,5 @@ npm-debug.log*
 .env.production
 # macOS
 .DS_Store
+# personal documents kept out of the repo
+/Pablo_Moral_Vega_Resume_EN_v8.pdf

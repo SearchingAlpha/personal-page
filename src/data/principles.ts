@@ -1,4 +1,4 @@
-// ── How I work ───────────────────────────────────────────────────────────────
+// ── How I work (the second part of /about) ───────────────────────────────────
 // Short lines, numbered on the page. Anything prefixed `TODO —` is a
 // placeholder: it is outlined on screen and listed by `npm run todo`.
 

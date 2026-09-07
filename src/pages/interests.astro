@@ -1,0 +1,77 @@
+---
+// Two parts on one page: books, then podcasts. The favourites sit on a shelf
+// at the top as covers — the one place the site shows pictures — and the whole
+// list follows, filed by theme, one line of synopsis per book. Each podcast is
+// one reference: its title, to Spotify.
+import Topic from '../layouts/Topic.astro';
+import { books, favourites, booksByTheme, podcasts } from '../data/interests';
+import { countWord, pad } from '../lib/letter';
+import { refs } from '../lib/refs';
+
+const shelf = favourites();
+const filed = booksByTheme();
+---
+
+<Topic href="/interests" description="What I read and listen to.">
+  <section class="part" id="books" aria-labelledby="books-head">
+    <h2 class="part__head" id="books-head">Books <span class="part__count">{pad(books.length)}</span></h2>
+    <p class="part__note">The {countWord(shelf.length)} I keep going back to. The whole shelf, by theme, follows.</p>
+
+    <ul class="shelf">
+      {
+        shelf.map((b) => (
+          <li>
+            {b.cover ? (
+              <img class="shelf__cover" src={b.cover} alt="" loading="lazy" decoding="async" />
+            ) : (
+              <span class="shelf__cover shelf__cover--type" aria-hidden="true">
+                {b.title}
+              </span>
+            )}
+            <span class="shelf__title">{b.title}</span>
+            <span class="shelf__by">{b.author}</span>
+          </li>
+        ))
+      }
+    </ul>
+
+    {
+      filed.map(({ theme, books }) => (
+        <section class="stack">
+          <h3 class="stack__theme">{theme}</h3>
+          <ul>
+            {books.map((b) => (
+              <li>
+                <span class="stack__title">{b.title}</span>
+                <span class="stack__by">{b.author}</span>
+                {b.favourite && <span class="stack__fav">favourite</span>}
+                {b.blurb && <p class="stack__blurb" set:html={refs(b.blurb)} />}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+  </section>
+
+  <section class="part" id="podcasts" aria-labelledby="podcasts-head">
+    <h2 class="part__head" id="podcasts-head">Podcasts <span class="part__count">{pad(podcasts.length)}</span></h2>
+    <ul class="rows">
+      {
+        podcasts.map((p) => (
+          <li>
+            <div class="row">
+              <span class="row__top">
+                <a class="row__title ref" href={p.spotify}>
+                  {p.name}
+                </a>
+                <span class="row__meta">{p.by}</span>
+              </span>
+              <p class="row__blurb" set:html={refs(p.blurb)} />
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</Topic>

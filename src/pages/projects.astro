@@ -1,0 +1,105 @@
+---
+// Two grids on a wide sheet. The active projects, two to a row: a picture, the
+// title, what it is, a summary and the specifics as bullets. Then the other
+// projects, three to a row: title and a line. Every link is a numbered
+// reference, cards in reading order.
+import Topic from '../layouts/Topic.astro';
+import { LIVE } from '../data/projects';
+import { getProjects } from '../lib/content';
+import { refs } from '../lib/refs';
+import { todoClass } from '../lib/todo';
+
+const all = getProjects();
+const active = all.filter((p) => p.active);
+const other = all.filter((p) => !p.active);
+---
+
+<Topic href="/projects" wide>
+  <section class="part" id="active" aria-labelledby="active-head">
+    <h2 class="part__head" id="active-head">Active projects</h2>
+    <p class="part__note">What I am building right now, at work and on the side.</p>
+    <ul class="cards cards--2">
+      {
+        active.map((p) => (
+          <li class="card">
+            {p.image && (
+              <figure class="card__figure">
+                <img class="card__img" src={p.image.src} alt={p.image.alt} loading="lazy" decoding="async" />
+                {p.image.credit && <figcaption class={`card__credit ${todoClass(p.image.credit)}`} set:html={refs(p.image.credit)} />}
+              </figure>
+            )}
+            <span class="row__top">
+              {p.url ? (
+                <a class="row__title ref" href={p.url}>
+                  {p.name}
+                </a>
+              ) : (
+                <span class="row__title">{p.name}</span>
+              )}
+              <span class={`pill ${LIVE.includes(p.status) ? 'pill--live' : ''}`}>{p.status}</span>
+              <span class="row__meta">{p.when ?? p.year}</span>
+            </span>
+            <p class="card__tags">{p.tags.map((t) => <span>{t}</span>)}</p>
+            <p class="row__blurb" set:html={refs(p.blurb)} />
+            {
+              p.points && p.points.length > 0 && (
+                <ul class="row__points">
+                  {p.points.map((pt) => (
+                    <li set:html={refs(pt)} />
+                  ))}
+                </ul>
+              )
+            }
+            {
+              p.posts && p.posts.length > 0 && (
+                <p class="row__posts">
+                  {p.posts.map((l) => (
+                    <a class="ref" href={l.url}>
+                      {l.label}
+                    </a>
+                  ))}
+                </p>
+              )
+            }
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  {
+    other.length > 0 && (
+      <section class="part" id="other" aria-labelledby="other-head">
+        <h2 class="part__head" id="other-head">Other projects</h2>
+        <p class="part__note">Side projects and experiments, over the years.</p>
+        <ul class="cards cards--3">
+          {other.map((p) => (
+            <li class="card">
+              <span class="row__top">
+                {p.url ? (
+                  <a class="row__title ref" href={p.url}>
+                    {p.name}
+                  </a>
+                ) : (
+                  <span class="row__title">{p.name}</span>
+                )}
+                <span class={`pill ${LIVE.includes(p.status) ? 'pill--live' : ''}`}>{p.status}</span>
+              </span>
+              <p class="card__tags">{p.tags.map((t) => <span>{t}</span>)}</p>
+              <p class="row__blurb" set:html={refs(p.blurb)} />
+              {p.posts && p.posts.length > 0 && (
+                <p class="row__posts">
+                  {p.posts.map((l) => (
+                    <a class="ref" href={l.url}>
+                      {l.label}
+                    </a>
+                  ))}
+                </p>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+</Topic>

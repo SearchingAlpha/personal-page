@@ -1,7 +1,7 @@
 ---
 import Topic from '../layouts/Topic.astro';
 import { profile } from '../data/profile';
-import { todoClass } from '../lib/rutherford';
+import { todoClass } from '../lib/todo';
 ---
 
 <Topic href="/elsewhere">
@@ -10,7 +10,7 @@ import { todoClass } from '../lib/rutherford';
       profile.socials.map((s) => (
         <li>
           <a href={s.url}>
-            <span class="links__label">{s.label}</span>
+            <span class="links__label ref">{s.label}</span>
             <span class="links__handle">{s.handle}</span>
           </a>
         </li>
@@ -18,7 +18,7 @@ import { todoClass } from '../lib/rutherford';
     }
     <li>
       <a href={`mailto:${profile.email}`} class={todoClass(profile.email)}>
-        <span class="links__label">Email</span>
+        <span class="links__label ref">Email</span>
         <span class="links__handle">{profile.email}</span>
       </a>
     </li>

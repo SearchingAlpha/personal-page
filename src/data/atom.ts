@@ -1,14 +1,16 @@
-// ── Rutherford: the atom page ────────────────────────────────────────────────
-// The nucleus is your name. Every topic of the site is an electron travelling
-// on one of the orbits around it. Click an electron, open the topic.
+// ── Rutherford: the atom page (draft, /atom) ─────────────────────────────────
+// The nucleus is your name. Every section of the site is an electron travelling
+// on one of the orbits around it. Click an electron, open the section.
+//
+// Which sections exist, their titles and routes, and the "now" line come from
+// src/data/letter.ts, the site's single source; this file only adds what the
+// atom needs — which orbit each one rides and where it starts.
 //
 // `electrons` is in display order: it drives the numbering (01, 02…) in the
-// legend and on the topic pages. Which orbit an electron rides is a separate
-// choice, made per electron with `orbit`.
-//
-// Growing the site is adding an electron here and its page in src/pages.
-// Three orbits reads as the classic atom symbol; past ~7 electrons the labels
-// start to collide near the nucleus.
+// atom's legend. Three orbits reads as the classic atom symbol; past ~7
+// electrons the labels start to collide near the nucleus.
+
+import { now, sectionFor, type Section } from './letter';
 
 export interface Orbit {
   /** Tilt of the ellipse, degrees clockwise. 0 / 60 / 120 is the atom symbol. */
@@ -18,11 +20,7 @@ export interface Orbit {
   direction: 'cw' | 'ccw';
 }
 
-export interface Electron {
-  /** Link text. One or two words: it travels, so it must stay short. */
-  label: string;
-  /** Route of the topic page. A page with this path must exist in src/pages. */
-  href: string;
+export interface Electron extends Section {
   /** Index into `orbits`. */
   orbit: number;
   /**
@@ -42,15 +40,14 @@ export const orbits: Orbit[] = [
 ];
 
 export const electrons: Electron[] = [
-  { label: 'Work', href: '/work', orbit: 0, phase: 0 },
-  { label: 'Writing', href: '/writing', orbit: 1, phase: 0 },
-  { label: 'How I work', href: '/method', orbit: 2, phase: 0.47 },
-  { label: 'Elsewhere', href: '/elsewhere', orbit: 0, phase: 0.47 },
+  { ...sectionFor('/projects'), orbit: 0, phase: 0 },
+  { ...sectionFor('/writing'), orbit: 1, phase: 0 },
+  { ...sectionFor('/about'), orbit: 2, phase: 0.47 },
+  { ...sectionFor('/elsewhere'), orbit: 0, phase: 0.47 },
 ];
 
 // ── The plate ────────────────────────────────────────────────────────────────
-// The margins around the atom, as on a figure in a lab notebook. Anything
-// prefixed `TODO —` is a placeholder: outlined on screen, listed by `npm run todo`.
+// The margins around the atom, as on a figure in a lab notebook.
 
 export interface Plate {
   /** Figure label under the atom. */
@@ -63,8 +60,8 @@ export interface Plate {
 
 export const plate: Plate = {
   figure: 'Fig. 1',
-  now: 'TODO — one line, present tense: what are you doing right now?',
-  nowUpdated: 'TODO — Month YYYY',
+  now: now.text,
+  nowUpdated: now.updated,
 };
 
 /** Zero-padded position of an electron in display order: "01", "02"… */
@@ -72,7 +69,7 @@ export function electronIndex(e: Electron): string {
   return String(electrons.indexOf(e) + 1).padStart(2, '0');
 }
 
-/** Looks up the electron for a topic page so its title stays single-sourced here. */
+/** Looks up the electron for a section page (used by the /atom draft). */
 export function electronFor(href: string): Electron {
   const hit = electrons.find((e) => e.href === href);
   if (!hit) throw new Error(`atom.ts: no electron points at "${href}" — add one or fix the page.`);

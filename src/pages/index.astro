@@ -1,193 +1,109 @@
 ---
-// ── Rutherford ───────────────────────────────────────────────────────────────
-// The home page is a plate from a lab notebook. The figure is an atom: the
-// name as nucleus, every topic an electron on a tilted orbit. The margins
-// carry the annotations — caption, index, a dated "now" line, links.
+// ── The letter ───────────────────────────────────────────────────────────────
+// The home page is a short letter: one paragraph in the first person, the
+// sections of the site linked from inside its sentences as numbered
+// references, the dated "now" line, and a short list of what is newest. The
+// words of the letter live here — edit them as prose. Which sections exist,
+// and the "now" line, come from ../data/letter.ts. The reference numbers are
+// a CSS counter (letter.css, "References"): reading order, nothing to keep.
 //
-// Layout and depth are CSS — see ../styles/rutherford.css. Motion is one
-// script: src/scripts/atom.ts moves the electrons and keeps their tags out of
-// each other's way; src/scripts/field.ts runs the particle field behind. The
-// geometry both rely on is in ../lib/atom-geometry.ts, which also writes each
-// electron's resting position into the HTML, so the page stands without them.
-// Which electrons exist lives in ../data/atom.ts.
+// Layout is CSS — see ../styles/letter.css. The one script is the intro
+// (../scripts/letter-intro.ts): the first time in a session, the greeting is
+// typed and the rest of the letter eases in around it. The page is complete
+// without it.
 import Layout from '../layouts/Layout.astro';
-import '../styles/rutherford.css';
+import '../styles/letter.css';
 import { profile } from '../data/profile';
-import { orbits, electrons, plate, electronIndex } from '../data/atom';
-import { principles } from '../data/principles';
-import { getProjects, getSortedWriting } from '../lib/content';
-import { FONT_LINKS, RX, RY, electronStyle, todoClass } from '../lib/rutherford';
+import { now, sectionFor } from '../data/letter';
+import { getRecent } from '../lib/content';
+import { FONT_LINKS } from '../lib/letter';
+import { todoClass } from '../lib/todo';
 
-const projects = getProjects();
-const posts = await getSortedWriting();
+const recent = await getRecent(4);
 
-// What each electron carries: how much is behind it, and the freshest item,
-// revealed while the visitor holds the electron still.
-const facts: Record<string, { count: number; peek: string }> = {
-  '/work': {
-    count: projects.length,
-    peek: projects[0] ? `${projects[0].name} — ${projects[0].status.toLowerCase()}` : '',
-  },
-  '/writing': { count: posts.length, peek: posts[0]?.data.title ?? '' },
-  '/method': { count: principles.length, peek: principles[0] ?? '' },
-  '/elsewhere': { count: profile.socials.length + 1, peek: profile.email },
-};
-const factsFor = (href: string) => facts[href] ?? { count: 0, peek: '' };
-const pad = (n: number) => String(n).padStart(2, '0');
+// A section linked from the letter: checked against letter.ts, so the letter
+// can never point at a page that does not exist.
+const sec = (href: string) => ({ href, title: sectionFor(href).label });
+const projects = sec('/projects');
+const writing = sec('/writing');
+const interests = sec('/interests');
+const about = sec('/about');
+const elsewhere = sec('/elsewhere');
 
-// The build is the observation.
-const observed = new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 const year = new Date().getFullYear();
 
-// Design4 highlights one word inside a neutral headline. For a name, that is
-// everything after the first word — nothing, when the name is a single word.
-const [nameFirst, ...nameRest] = profile.name.split(' ');
-
-// The line typed on first opening (src/scripts/intro.ts). It must end with
-// the name: the greeting backspaces away and the name becomes the nucleus.
-const intro = `Hi, this is ${profile.name}`;
+// The first words of the letter, typed on first opening (letter-intro.ts).
+const greeting = `Hi, I'm ${profile.name}`;
 ---
 
 <Layout
   title={profile.name}
   description={profile.tagline}
-  bodyClass="rutherford"
+  bodyClass="letter"
   fontLinks={FONT_LINKS}
 >
   <!-- Decided before the first paint, so the intro never flashes the page:
-       once per session, and never for those who prefer reduced motion. -->
+       once per session, and never for those who prefer reduced motion.
+       Opening /#intro plays it again. -->
   <script is:inline>
     try {
-      if (!sessionStorage.getItem('rutherford-intro') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      var again = location.hash === '#intro';
+      if ((again || !sessionStorage.getItem('letter-intro')) && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
         document.documentElement.classList.add('intro');
       }
     } catch {}
   </script>
 
-  <div class="plate plate--atom">
-    <!-- The particle field: a cellular automaton, drawn by the script below. -->
-    <canvas class="field" aria-hidden="true"></canvas>
-    <span class="corners" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-    <!-- The intro's typed line; empty and hidden unless the intro runs. -->
-    <p class="greeting" aria-hidden="true"><span class="greeting__pre"></span><span class="greeting__name"></span></p>
+  <header class="top">
+    <a href="/">{profile.name}</a>
+    <span>{profile.location} · {year}</span>
+  </header>
 
-    <header class="plate__head">
-      <span class="plate__wordmark">{profile.name}</span>
-      <span class="plate__meta">{profile.location} · {year}</span>
-    </header>
+  <main class="page">
+    <!-- The letter. .lead__hi is what the intro types; keep it the start of the
+         sentence, and keep the two spans adjacent so no space slips between.
+         Every link is class="ref": the numbers come from reading order. No
+         figures in the letter itself. -->
+    <p class="lead">
+      <span class="lead__hi" data-text={greeting}>{greeting}</span><span class="lead__rest">, an <strong>engineer from Spain</strong> working in <strong>Amazon's supply chain</strong>, based in Luxembourg.
+        On the side I build <a class="ref" href={projects.href} title={projects.title}>projects</a>
+        and write about <a class="ref" href={writing.href} title={writing.title}>how it goes</a>.
+        I'm very curious, so I keep <a class="ref" href={interests.href} title={interests.title}>consuming knowledge</a>.
+        There is a bit more <a class="ref" href={about.href} title={about.title}>about me</a>,
+        and you can find me on <a class="ref" href={elsewhere.href} title={elsewhere.title}>other social media</a>.</span>
+    </p>
 
-    <main class="stage">
-      <figure class="figure">
-        <div class="atom" style={`--rx:${RX}%;--ry:${RY}%`} data-intro={intro} data-name={profile.name}>
-          {
-            orbits.map((o, i) => (
-              <div class="ring" data-orbit={i} style={`--tilt:${o.tilt}deg`} aria-hidden="true" />
-            ))
-          }
+    <p class="now">
+      <span class={todoClass(now.text)}>{now.text}</span>
+      <span class={`now__stamp ${todoClass(now.updated)}`}>{now.updated}</span>
+    </p>
 
-          <div class="nucleus" style={`--name-chars:${profile.name.length}`}>
-            <span class="corners" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-            <h1 class="nucleus__name">
-              {nameFirst}{nameRest.length > 0 && <span class="hl"> {nameRest.join(' ')}</span>}
-            </h1>
-            <p class="nucleus__role">{profile.role}</p>
-          </div>
-
-          <!-- Each electron carries its orbit in data attributes for the script
-               and its resting place in custom properties for the stylesheet. -->
-          <nav class="electrons" aria-label="Topics">
-            {
-              electrons.map((e) => {
-                const o = orbits[e.orbit];
-                const f = factsFor(e.href);
-                return (
-                  <a
-                    class="electron"
-                    href={e.href}
-                    data-orbit={e.orbit}
-                    data-tilt={o.tilt}
-                    data-period={o.period}
-                    data-dir={o.direction}
-                    data-phase={e.phase}
-                    style={electronStyle(o, e)}
-                  >
-                    <span class="electron__body">
-                      <span class="electron__dot" aria-hidden="true" />
-                      <span class="electron__tag">
-                        <span class="electron__label">{e.label}</span>
-                        <span class="electron__count">{pad(f.count)}</span>
-                        {f.peek && <span class={`electron__peek ${todoClass(f.peek)}`}>{f.peek}</span>}
-                      </span>
-                    </span>
-                  </a>
-                );
-              })
-            }
-          </nav>
-        </div>
-
-        <figcaption class="figure__cap">
-          {plate.figure} — {profile.name}, {profile.role}. {orbits.length} orbits,
-          {electrons.length} electrons. Observed {observed}.
-        </figcaption>
-      </figure>
-    </main>
-
-    <footer class="plate__foot">
-      <nav class="legend" aria-label="Index">
-        <ol>
-          {
-            electrons.map((e) => (
-              <li>
-                <a href={e.href}>
-                  <span class="legend__i">{electronIndex(e)}</span>
-                  <span class="legend__name">{e.label}</span>
-                  <span class="legend__leader" aria-hidden="true" />
-                  <span class="legend__n">{pad(factsFor(e.href).count)}</span>
-                </a>
-              </li>
-            ))
-          }
-        </ol>
-      </nav>
-
-      <div class="now">
-        <p class="now__eyebrow">Now</p>
-        <p class={`now__text ${todoClass(plate.now)}`}>{plate.now}</p>
-        <p class={`now__stamp ${todoClass(plate.nowUpdated)}`}>{plate.nowUpdated}</p>
-      </div>
-
-      <ul class="plate__links">
+    <section class="recently" aria-labelledby="recently">
+      <h2 class="recently__head" id="recently">Recently</h2>
+      <ul>
         {
-          profile.socials.map((s) => (
+          recent.map((r) => (
             <li>
-              <a href={s.url}>{s.label}<span aria-hidden="true"> ↗</span></a>
+              <span class="recently__date">{r.when}</span>
+              <a class="recently__title ref" href={r.href}>{r.title}</a>
+              <span class="recently__kind">{r.kind}</span>
             </li>
           ))
         }
-        <li>
-          <a href={`mailto:${profile.email}`}>Email</a>
-        </li>
       </ul>
-    </footer>
-  </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <a href={`mailto:${profile.email}`} class={todoClass(profile.email)}>{profile.email}</a>
+    <nav aria-label="Elsewhere">
+      {profile.socials.map((s) => <a href={s.url}>{s.label}</a>)}
+      <a href={`mailto:${profile.email}`}>Email</a>
+    </nav>
+  </footer>
 </Layout>
 
 <script>
-  // The one script on this page: the field behind the plate, the atom on it,
-  // and the intro that reveals them. Tuning constants sit at the top of each
-  // module. The page is complete without it — the atom just stands at its
-  // starting phase.
-  import { startField } from '../scripts/field';
-  import { startAtom } from '../scripts/atom';
-  import { startIntro } from '../scripts/intro';
-
-  const plate = document.querySelector<HTMLElement>('.plate');
-  const atom = plate?.querySelector<HTMLElement>('.atom');
-  const canvas = plate?.querySelector<HTMLCanvasElement>('.field');
-  if (plate && atom) {
-    if (canvas) startField(plate, canvas, { el: atom, shape: 'round' });
-    startAtom(atom, plate);
-    startIntro(plate, atom.dataset.intro ?? '', atom.dataset.name ?? '');
-  }
+  import { startIntro } from '../scripts/letter-intro';
+  startIntro();
 </script>

@@ -1,0 +1,26 @@
+---
+// Who is writing: the basics as one fact per line, then the short list of how
+// I work. Both in the first person; both from src/data.
+import Topic from '../layouts/Topic.astro';
+import { intro, basics } from '../data/about';
+import { principles } from '../data/principles';
+import { refs } from '../lib/refs';
+import { todoClass } from '../lib/todo';
+---
+
+<Topic href="/about" description="Who is writing: the basics, and how I work.">
+  <section class="part" id="basics" aria-labelledby="basics-head">
+    <h2 class="part__head" id="basics-head">The basics</h2>
+    <p class="part__note">{intro}</p>
+    <ul class="facts">
+      {basics.map((line) => <li set:html={refs(line)} />)}
+    </ul>
+  </section>
+
+  <section class="part" id="how-i-work" aria-labelledby="how-head">
+    <h2 class="part__head" id="how-head">How I work</h2>
+    <ol class="creed">
+      {principles.map((line) => <li class={todoClass(line)}>{line}</li>)}
+    </ol>
+  </section>
+</Topic>

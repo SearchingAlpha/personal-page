@@ -1,69 +1,71 @@
 ---
-// One topic page = one electron, opened. The title and number come from
-// atom.ts so the label on the orbit, the legend and the heading here can never
-// drift apart. The page is the same plate as the home — frame, corner dots,
-// the particle field behind — with a column of text where the atom was.
+// One section page = one section of the letter, opened. The title and number
+// come from letter.ts so the link in the letter and the heading here can never
+// drift apart. The page is the same sheet as the home — warm paper, the label
+// register in the margins — with a title and a column of entries.
+//
+// Moving around: the header carries the name (home) and the other sections;
+// the footer, home again and the next section, so the four pages can be read
+// in a loop without going back to the letter.
 import Layout from './Layout.astro';
-import '../styles/rutherford.css';
+import '../styles/letter.css';
 import { profile } from '../data/profile';
-import { electrons, electronFor, electronIndex } from '../data/atom';
-import { FONT_LINKS } from '../lib/rutherford';
+import { sections, sectionFor, sectionIndex } from '../data/letter';
+import { FONT_LINKS, pad } from '../lib/letter';
 
 interface Props {
-  /** Route of this page, e.g. "/work". Must match an electron's href. */
+  /** Route of this page, e.g. "/projects". Must match a section's href. */
   href: string;
   description?: string;
+  /** A wider sheet, for pages laid out as grids of cards (/projects). */
+  wide?: boolean;
 }
 
-const { href, description = profile.tagline } = Astro.props;
-const electron = electronFor(href);
-const total = String(electrons.length).padStart(2, '0');
+const { href, description = profile.tagline, wide = false } = Astro.props;
+const section = sectionFor(href);
+const at = sections.indexOf(section);
+const next = sections[(at + 1) % sections.length];
 const year = new Date().getFullYear();
 ---
 
 <Layout
-  title={`${electron.label} — ${profile.name}`}
+  title={`${section.label} — ${profile.name}`}
   description={description}
-  bodyClass="rutherford"
+  bodyClass="letter"
   fontLinks={FONT_LINKS}
 >
-  <div class="plate plate--topic">
-    <!-- The particle field, keeping clear of the column. -->
-    <canvas class="field" aria-hidden="true"></canvas>
-    <span class="corners" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+  <div class={`topic ${wide ? 'topic--wide' : ''}`}>
+    <header class="topic__head">
+      <div class="topic__bar">
+        <a class="topic__back" href="/">← {profile.name}</a>
+        <nav class="topic__nav" aria-label="Sections">
+          {
+            sections.map((s) =>
+              s === section ? (
+                <span aria-current="page">{s.label}</span>
+              ) : (
+                <a href={s.href}>{s.label}</a>
+              ),
+            )
+          }
+        </nav>
+      </div>
+      <div>
+        <p class="topic__index">{sectionIndex(section)} / {pad(sections.length)}</p>
+        <h1 class="topic__title">{section.label}</h1>
+      </div>
+    </header>
 
-    <div class="topic">
-      <header class="topic__head">
-        <a class="topic__back" href="/">
-          <span class="mark" aria-hidden="true"></span>
-          {profile.name}
-        </a>
-        <div>
-          <p class="topic__index">Electron {electronIndex(electron)} / {total}</p>
-          <div class="topic__title-row">
-            <span class="sparkle" aria-hidden="true"><i></i></span>
-            <h1 class="topic__title">{electron.label}</h1>
-          </div>
-        </div>
-      </header>
+    <main class="topic__body">
+      <slot />
+    </main>
 
-      <main class="topic__body">
-        <slot />
-      </main>
-
-      <footer class="topic__foot">
-        <span>{profile.name} · {year}</span>
-        <a href="/">← Nucleus</a>
-      </footer>
-    </div>
+    <footer class="topic__foot">
+      <span>{profile.name} · {year}</span>
+      <nav class="topic__foot-nav" aria-label="Continue">
+        <a href="/">← Home</a>
+        <a href={next.href}>{next.label} →</a>
+      </nav>
+    </footer>
   </div>
 </Layout>
-
-<script>
-  import { startField } from '../scripts/field';
-
-  const plate = document.querySelector<HTMLElement>('.plate');
-  const canvas = plate?.querySelector<HTMLCanvasElement>('.field');
-  const topic = plate?.querySelector<HTMLElement>('.topic');
-  if (plate && canvas && topic) startField(plate, canvas, { el: topic, shape: 'box' });
-</script>
