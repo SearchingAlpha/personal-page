@@ -25,7 +25,6 @@ const other = all.filter((p) => !p.active);
             {p.image && (
               <figure class="card__figure">
                 <img class="card__img" src={p.image.src} alt={p.image.alt} loading="lazy" decoding="async" />
-                {p.image.credit && <figcaption class={`card__credit ${todoClass(p.image.credit)}`} set:html={refs(p.image.credit)} />}
               </figure>
             )}
             <span class="row__top">
@@ -61,6 +60,12 @@ const other = all.filter((p) => !p.active);
                 </p>
               )
             }
+            {/* The picture's attribution sits at the foot of the card, not under
+                the picture: that way every card's title starts on the same line
+                and the grid stays square. */}
+            {p.image?.credit && (
+              <p class={`card__credit ${todoClass(p.image.credit)}`} set:html={refs(p.image.credit)} />
+            )}
           </li>
         ))
       }

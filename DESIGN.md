@@ -29,10 +29,17 @@ Lo que hace que este sitio sea este sitio, escrito para no reabrirlo cada vez. S
 - **Papel cálido, tinta casi negra, un solo acento óxido.** El acento marca lo que se puede seguir (subrayados de la carta, ordinales) y lo que está vivo (*Growing*, *Building*, *favourite*). No decora.
 - Todo el color está en `:root` al principio de `src/styles/letter.css`.
 
-## Superficies
+## Superficies — la placa
 
-- **Líneas finas, sin cajas ni sombras.** Las entradas se separan con hairlines.
-- **Imágenes solo donde son contenido:** las portadas de los favoritos en `/interests` y la imagen de cada proyecto activo en `/projects`, siempre con un borde de un píxel y sin sombra. Nunca decorativas.
+- **Dos escalones de papel, y solo dos.** La hoja es el claro (`--paper: #fbf9f4`) y **la placa es un escalón más profundo** (`--surface: #f5f1e8`): una placa se asienta en la página, no se levanta sobre ella. Probado al revés en septiembre de 2026 —hoja `#ece5d6`, placa `#fdfbf7`— y las placas pasaban a leerse como hojas sobre una mesa: **no es lo que este sitio quiere.** El papel profundo además baja `--muted` a 3,8:1, por debajo de AA para las etiquetas de 12 px, así que una inversión obliga a oscurecerlo también.
+- **Un solo rectángulo, repetido.** En una página de sección, todo bloque de contenido se dibuja igual: borde hairline de un píxel, esquina de 2 px, el escalón profundo de papel y un único padding. Vale para la nota bajo el nombre de una sección, cada tarjeta de una cuadrícula, la estantería, una lista archivada, la hoja de datos y cada principio. Modelo: [gulipad.com](https://www.gulipad.com/).
+- **Los chips vuelven al papel de la hoja** (`.pill`, las etiquetas de una tarjeta): sobre la placa se leen como marcas encima, no como agujeros.
+- **La consistencia es que solo hay una regla.** La lista de selectores de la placa está en un sitio (`src/styles/letter.css`, "The plate"). Un bloque nuevo se añade a esa lista; **nunca se escribe una segunda caja.**
+- **La carta no lleva placas.** La portada es prosa desnuda sobre la hoja: una carta no tiene paneles.
+- **Las secciones se distinguen por una regla, no por una caja más pesada.** El nombre de la sección y, desde él hasta el margen derecho, un filete de un píxel (`.part__head`). Un peso de caja, un peso de línea. Un nivel por debajo —una temática en `/interests`— la etiqueta va sola: la placa de abajo es la que cierra el grupo.
+- **La cabecera y el pie llevan el suyo:** el filete bajo el masthead y el de encima del pie son el marco de la página; entre los dos está el contenido, y todas las placas alinean con los mismos márgenes.
+- **Sin sombras, en ningún sitio.**
+- **Imágenes solo donde son contenido:** las portadas de los favoritos en `/interests` y la imagen de cada proyecto activo en `/projects`. La imagen de una tarjeta llega a sangre hasta el borde de la placa —el borde de la placa es su marco— y el crédito baja al pie de la tarjeta, para que todos los títulos empiecen en la misma línea y la cuadrícula quede cuadrada. Nunca decorativas.
 - **Una sola medida (660 px) para todo lo que es prosa.** La excepción es `/projects`, una hoja ancha (1080 px) porque es una cuadrícula de tarjetas; dentro de cada tarjeta el texto vuelve a una columna estrecha.
 
 ## Proyectos

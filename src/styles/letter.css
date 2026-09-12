@@ -15,16 +15,29 @@
    - Warm off-white paper, near-black ink, one rust accent. The accent marks
      what can be followed (underlines, reference numbers) and what is live.
    - Every link in the body is a numbered reference — see "References".
-   - Hairlines, no boxes, no shadows.
+   - The letter is bare prose. On a section page, every block of content is
+     the same rectangle — see "The plate". No shadows, anywhere.
    - The first opening types the greeting and lets the rest of the letter
      ease in around it (src/scripts/letter-intro.ts); see "The intro" below.
    ───────────────────────────────────────────────────────────────────────────── */
 
 :root {
+  /* Two steps of warm paper, and only two: the sheet is the light one and the
+     plate is a step deeper, so a plate settles into the page rather than
+     lifting off it. (Tried the other way round in Sept 2026 — sheet #ece5d6,
+     plate #fdfbf7 — and the plates read as sheets on a desk, which was not
+     what this site wants. Deeper paper also drops --muted to 3.8:1, under AA
+     for the 12 px label register, so an inversion has to darken it too.) */
   --paper: #fbf9f4;
+  --surface: #f5f1e8;
+
   --ink: #1c1a17;
   --ink-soft: #3d3833;
-  --muted: #77716a;
+  /* Five values darker than the #77716a this used to be. Muted text also sits
+     on plates now, and against the deeper paper the old grey was 4.3:1 — under
+     AA for the 12 px label register and the 17 px blurbs. Imperceptible on the
+     sheet; it clears 4.5:1 on both surfaces. */
+  --muted: #726c65;
   --hair: #e3ded4;
   --rust: #b3401e;
 
@@ -36,6 +49,10 @@
 
   --gutter: clamp(20px, 4vw, 40px);
   --measure: 660px;
+
+  /* The plate: one corner, one padding, everywhere. */
+  --radius: 2px;
+  --pad: clamp(17px, 2vw, 24px);
 
   --dur: 220ms;
   --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
@@ -373,12 +390,16 @@ html.intro-reveal :is(.top, .foot) {
   gap: 28px;
 }
 
+/* The masthead. Its rule and the footer's are the page's own frame: everything
+   between them is content, and every plate inside aligns to the same margins. */
 .topic__bar {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   flex-wrap: wrap;
   gap: 10px 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--hair);
 }
 
 .topic__back {
@@ -442,12 +463,49 @@ html.intro-reveal :is(.top, .foot) {
   color: var(--accent);
 }
 
-/* ── Entries ───────────────────────────────────────────────────────────── */
+/* ── The plate ─────────────────────────────────────────────────────────────
+   One rectangle, repeated. On a section page every block of content is drawn
+   the same way — a hairline border, a 2px corner, one step of deeper paper,
+   one padding: the note under a section's name, a card in a grid, a filed
+   list, a fact sheet, a principle. That single shape is all the structure the
+   pages need; keeping it to one rule here is what keeps them consistent, so
+   add a selector to this list rather than writing a second box.
+
+   Two things stay outside it. The letter (the home page) is bare prose — a
+   letter has no panels. And sections are told apart by the rule that runs
+   from their name to the right margin (.part__head), never by a heavier
+   plate: one weight of box, one weight of line. */
+
+.plate,
+.part__note,
+.card,
+.facts,
+.creed li,
+.rows,
+.links,
+.shelf,
+.stack ul {
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius);
+  padding: var(--pad);
+}
+
+/* Small things sitting on a plate step back up to the sheet's paper, so they
+   read as marks on it rather than holes in it. */
+.plate .pill,
+.card .pill,
+.card__tags span {
+  background: var(--paper);
+}
+
+/* ── Entries ───────────────────────────────────────────────────────────────
+   A list inside a plate: the plate's own border closes it top and bottom, so
+   the entries only need a hairline between them. */
 
 .rows {
   list-style: none;
   margin: 0;
-  padding: 0;
 }
 
 .rows > li {
@@ -456,6 +514,10 @@ html.intro-reveal :is(.top, .foot) {
 
 .rows > li:first-child {
   padding-top: 0;
+}
+
+.rows > li:last-child {
+  padding-bottom: 0;
 }
 
 .rows > li + li {
@@ -546,27 +608,37 @@ a.row__title:hover {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+/* A card is a plate (see "The plate"). It fills its row, so two cards of
+   unequal text still square off against each other — which is the whole point
+   of the grid being visible. */
 .card {
   display: flex;
   flex-direction: column;
   gap: 8px;
   min-width: 0;
+  height: 100%;
 }
 
+/* The picture runs to the plate's edges: the plate's border frames it, so the
+   image needs none of its own. Its caption is padded back in. */
 .card__figure {
-  margin: 0 0 8px;
+  margin: calc(-1 * var(--pad)) calc(-1 * var(--pad)) 12px;
 }
 
 .card__img {
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
-  border: 1px solid var(--hair);
+  border-bottom: 1px solid var(--hair);
+  border-radius: 1px 1px 0 0;
   background: var(--hair);
 }
 
+/* margin-top: auto drops it to the foot of the plate, however tall the row is. */
 .card__credit {
-  margin: 6px 0 0;
+  margin: auto 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--hair);
   font-family: var(--sans);
   font-size: 11px;
   letter-spacing: 0.02em;
@@ -577,13 +649,21 @@ a.row__title:hover {
   color: var(--accent);
 }
 
-/* What kind of thing it is: a few words in the label register. */
+/* What kind of thing it is: a few words in the label register, each in its own
+   chip so the row reads as a set of facts and not as a sentence. */
 .card__tags {
   margin: 0;
   color: var(--muted);
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 14px;
+  gap: 6px;
+}
+
+.card__tags span {
+  padding: 3px 8px;
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  white-space: nowrap;
 }
 
 .card .row__blurb {
@@ -603,11 +683,10 @@ a.row__title:hover {
   }
 }
 
-/* ── About me: the basics, one fact per line. ─────────────────────────── */
+/* ── About me: the basics, one fact per line, all on one plate. ────────── */
 .facts {
   list-style: none;
   margin: 0;
-  padding: 0;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -658,7 +737,7 @@ a.row__title:hover {
   border-color: var(--accent);
 }
 
-/* Numbered principles. */
+/* Numbered principles — one plate each, so each one stands on its own. */
 .creed {
   list-style: none;
   margin: 0;
@@ -666,16 +745,16 @@ a.row__title:hover {
   counter-reset: creed;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 12px;
 }
 
 .creed li {
   counter-increment: creed;
   display: grid;
-  grid-template-columns: 40px 1fr;
+  grid-template-columns: 34px 1fr;
   gap: 12px;
-  font-size: clamp(22px, 2.6vw, 26px);
-  line-height: 1.3;
+  font-size: clamp(20px, 2.4vw, 24px);
+  line-height: 1.35;
   letter-spacing: -0.01em;
   color: var(--ink-soft);
   text-wrap: pretty;
@@ -684,14 +763,13 @@ a.row__title:hover {
 .creed li::before {
   content: counter(creed, decimal-leading-zero);
   color: var(--muted);
-  padding-top: 0.55em;
+  padding-top: 0.42em;
 }
 
-/* Outbound links. */
+/* Outbound links: one plate, a hairline between the rows. */
 .links {
   list-style: none;
   margin: 0;
-  padding: 0;
 }
 
 .links > li + li {
@@ -707,6 +785,10 @@ a.row__title:hover {
 
 .links > li:first-child a {
   padding-top: 0;
+}
+
+.links > li:last-child a {
+  padding-bottom: 0;
 }
 
 .links a:hover {
@@ -745,30 +827,41 @@ a.row__title:hover {
   margin-top: 72px;
 }
 
+/* A section's name, with a rule running from it to the right margin: this,
+   and not a border, is what says where a section starts. */
 .part__head {
-  margin: 0 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 16px;
   color: var(--muted);
+}
+
+.part__head::after {
+  content: '';
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--hair);
 }
 
 /* The count after the part's name, in the accent like the letter's. */
 .part__count {
   color: var(--accent);
-  margin-left: 6px;
+  flex: none;
 }
 
 .part__note {
-  margin: 0 0 28px;
+  margin: 0 0 24px;
   font-size: 17px;
   line-height: 1.5;
-  color: var(--muted);
+  color: var(--ink-soft);
   text-wrap: pretty;
 }
 
-/* The shelf: covers, five to a row at full measure. */
+/* The shelf: covers, five to a row at full measure, on a plate of their own. */
 .shelf {
   list-style: none;
   margin: 0;
-  padding: 0;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
   gap: 26px 16px;
@@ -818,16 +911,16 @@ a.row__title:hover {
   margin-top: 44px;
 }
 
+/* A theme is one level under a section, so it keeps a bare label: the plate
+   below it is what closes the group. */
 .stack__theme {
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   color: var(--muted);
 }
 
 .stack ul {
   list-style: none;
   margin: 0;
-  padding: 0;
-  border-top: 1px solid var(--hair);
 }
 
 .stack li {
@@ -835,10 +928,21 @@ a.row__title:hover {
   align-items: baseline;
   flex-wrap: wrap;
   gap: 2px 10px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--hair);
+  padding: 11px 0;
   font-size: 18px;
   line-height: 1.4;
+}
+
+.stack li:first-child {
+  padding-top: 0;
+}
+
+.stack li:last-child {
+  padding-bottom: 0;
+}
+
+.stack li + li {
+  border-top: 1px solid var(--hair);
 }
 
 .stack__title {
