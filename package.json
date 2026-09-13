@@ -9,9 +9,10 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "todo": "grep -rn 'TODO —' src/ || echo 'No placeholders left.'"
+    "todo": "node scripts/todo.mjs"
   },
   "dependencies": {
+    "@astrojs/rss": "^4.0.19",
     "astro": "^5.6.1"
   }
 }

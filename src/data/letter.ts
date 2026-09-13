@@ -29,7 +29,7 @@ export const sections: Section[] = [
 // `npm run todo`.
 export const now = {
   /** One line, present tense: what you are actually doing right now. */
-  text: "Right now I'm building LLM agents that write the daily planning narrative for Amazon's EU supply chain, and growing ShortLoad on the side.",
+  text: "Working in Amazon building genAI applications. Right now I'm experimenting in the startup world.",
   /** When `text` was last true. Shown next to it — keeps you honest. */
   updated: 'Sep 2026',
 };

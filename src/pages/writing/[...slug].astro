@@ -1,0 +1,146 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import '../../styles/letter.css';
+import { profile } from '../../data/profile';
+import { formatDate } from '../../lib/content';
+import { FONT_LINKS } from '../../lib/letter';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('writing');
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const year = new Date().getFullYear();
+---
+
+<Layout
+  title={`${post.data.title} — ${profile.name}`}
+  description={post.data.excerpt}
+  bodyClass="letter"
+  fontLinks={FONT_LINKS}
+>
+  <div class="topic">
+    <header class="topic__head">
+      <div class="topic__bar">
+        <a class="topic__back" href="/writing">← Writing</a>
+        <span class="topic__index">{formatDate(post.data.date)}</span>
+      </div>
+      <div>
+        <h1 class="topic__title essay__head">{post.data.title}</h1>
+        {post.data.readingTime && (
+          <p class="topic__index essay__meta">{post.data.readingTime} read</p>
+        )}
+      </div>
+    </header>
+
+    <main class="topic__body">
+      <article class="plate essay">
+        <Content />
+      </article>
+    </main>
+
+    <footer class="topic__foot">
+      <span>{profile.name} · {year}</span>
+      <nav class="topic__foot-nav" aria-label="Continue">
+        <a href="/writing">← All essays</a>
+        <a href="/">Home →</a>
+      </nav>
+    </footer>
+  </div>
+</Layout>
+
+<style>
+  .essay__head {
+    font-size: clamp(28px, 4vw, 36px);
+    line-height: 1.25;
+    margin-top: 8px;
+    letter-spacing: -0.015em;
+  }
+
+  .essay__meta {
+    margin-top: 6px;
+    color: var(--muted);
+  }
+
+  .essay {
+    padding: clamp(24px, 3.5vw, 40px);
+    font-size: 19px;
+    line-height: 1.65;
+    color: var(--ink-soft);
+  }
+
+  .essay :global(h2) {
+    font-size: clamp(21px, 2.4vw, 25px);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--ink);
+    margin: 1.8em 0 0.6em;
+    letter-spacing: -0.01em;
+  }
+
+  .essay :global(p) {
+    margin: 0 0 1.25em;
+    text-wrap: pretty;
+  }
+
+  .essay :global(p strong),
+  .essay :global(li strong) {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .essay :global(ul),
+  .essay :global(ol) {
+    margin: 0 0 1.25em;
+    padding-left: 1.4em;
+  }
+
+  .essay :global(li) {
+    margin-bottom: 0.4em;
+    text-wrap: pretty;
+  }
+
+  .essay :global(blockquote) {
+    margin: 1.5em 0;
+    padding: 0.4em 0 0.4em 1.2em;
+    border-left: 2px solid var(--accent);
+    color: var(--ink);
+    font-style: italic;
+    background: transparent;
+  }
+
+  .essay :global(a) {
+    color: var(--accent);
+    border-bottom: 1px solid var(--accent);
+    text-decoration: none;
+    transition: opacity var(--dur) var(--ease);
+  }
+
+  .essay :global(a:hover) {
+    opacity: 0.8;
+  }
+
+  .essay :global(code) {
+    font-family: ui-monospace, 'JetBrains Mono', Menlo, monospace;
+    font-size: 0.86em;
+    background: var(--paper);
+    padding: 2px 6px;
+    border-radius: 2px;
+    border: 1px solid var(--hair);
+  }
+
+  .essay :global(pre) {
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    border-radius: 2px;
+    padding: 16px;
+    overflow-x: auto;
+    margin: 1.5em 0;
+  }
+</style>

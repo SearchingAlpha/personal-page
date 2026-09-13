@@ -54,7 +54,7 @@ export async function getRecent(limit = 4): Promise<RecentItem[]> {
     when: formatMonthYear(p.data.date),
     title: p.data.title,
     kind: 'essay',
-    href: '/writing',
+    href: `/writing/${p.id}`,
   }));
   const work: RecentItem[] = projects.map((p) => ({
     date: new Date(p.year, 6, 1),

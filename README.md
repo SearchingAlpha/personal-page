@@ -171,12 +171,13 @@ Dos clases de placeholder, y solo una se detecta automáticamente:
 - [x] Reescribir la carta en `index.astro`
 - [x] Proyectos reales en `projects.ts` (ShortLoad, Polymarket supply-chain intel) — añadir los que falten
 - [x] Escribir la línea `now` en `letter.ts` — borrador; revisar
-- [ ] Los tres principios en `principles.ts` (segunda parte de `/about`)
-- [ ] Sustituir la foto de Amazon en `public/projects/amazon.jpg` por una propia, si se quiere, y ajustar el crédito
-- [ ] Completar la lista de libros en `interests.ts` (faltan los que no recordaba) y, si se quiere, ampliar la estantería
-- [ ] Borrar los cuatro artículos de relleno de `src/content/writing/`
-- [ ] Generar `/rss.xml` o quitar el enlace RSS de `profile.ts`
-- [ ] Páginas por artículo (`src/pages/writing/[...slug].astro`) — ahora los artículos se listan pero no se pueden abrir; *Recently* debería enlazarlos
+- [x] Los tres principios en `principles.ts` (segunda parte de `/about`)
+- [x] Foto de Amazon en `public/projects/amazon.jpg` con crédito legal
+- [x] Lista de libros en `interests.ts` y estantería de favoritos
+- [x] Artículos reales en `src/content/writing/` (loop engineering, gusto vs correctness, building in public)
+- [x] Generar `/rss.xml` automáticamente con `@astrojs/rss`
+- [x] Páginas por artículo (`src/pages/writing/[...slug].astro`) y *Recently* enlazándolos
 - [ ] Poner el dominio real en `astro.config.mjs`
-- [ ] Favicon propio (`public/favicon.svg` es el de Astro)
+- [x] Favicon propio (`public/favicon.svg` tipográfico con ordinal de referencia)
+- [x] Workflow de GitHub Actions para despliegue automático en `.github/workflows/deploy.yml`
 - [ ] Decidir si los borradores (`/drafts`) se conservan o se retiran

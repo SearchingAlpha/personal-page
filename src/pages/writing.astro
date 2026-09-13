@@ -12,7 +12,7 @@ const posts = await getSortedWriting();
         <li>
           <div class="row">
             <span class="row__top">
-              <span class="row__title">{post.data.title}</span>
+              <a class="row__title ref" href={`/writing/${post.id}`}>{post.data.title}</a>
               <span class="row__meta">{formatDateShort(post.data.date)}</span>
             </span>
             <p class="row__blurb">{post.data.excerpt}</p>

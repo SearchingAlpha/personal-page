@@ -1,16 +1,15 @@
 // ── About me ─────────────────────────────────────────────────────────────────
 // The basics, one fact per line, in the first person. **Bold** for the words
-// that matter in each line; [text](url) for a reference. The "how I work"
-// principles under them live in principles.ts.
+// that matter in each line; [text](url) for a reference.
 
 export const intro =
   'A few things about me, for anyone who wants to know who is writing.';
 
 export const basics: string[] = [
-  '**Engineer from Spain**, based in **Luxembourg** since 2024. Before that, Valencia and Barcelona.',
-  '**Mechanical engineer** by training, at the Universitat Politècnica de València. There I spent two years in the **FSUPV Formula Student team** — the best Spanish team since its creation, third in the world in 2022 — first designing structures with finite elements and topology optimisation, then as **Head of Dynamics**, running a team of six and a €20k budget.',
-  "I work in **Amazon's supply chain**: outbound planning for the European non-sortable network, and lately **LLM agents** that take the repetitive work off the analysts. Before Amazon, I configured the WMS for a new Mango warehouse and built its test automation, and I planned production at Pulverizadores Fede, a Kubota company.",
-  '**Python, SQL and AWS** are my everyday tools; QuickSight and Tableau when a chart is the answer.',
-  'On the side I build [projects](/projects) — ShortLoad is the current one — and I read a lot: history, science, markets. The list is under [Interests](/interests).',
-  '**Spanish** is my mother tongue; **English**, fluent.',
+  'Born in a small village in **Valencia, Spain**. Since then I have lived in **Barcelona** and now in **Luxembourg**.',
+  '**Extremely curious** from the very beginning: I would interrogate my parents on why things happened until they were completely exhausted. My kindergarten teacher told them I would end up either a **politician or a philosopher**.',
+  "As a kid, my playground was my father's tool-filled garage, building whatever came to mind: **extracting hydrogen** via water electrolysis, **making thermite**, electrocuting vegetables to test dissolved salts, and building drones.",
+  "**Mechanical engineer** by training (Formula Student Head of Dynamics at UPV). Today I work in **Amazon's supply chain** in Luxembourg, building planning workflows and **LLM agents**.",
+  'I love technology, but strictly as a **means rather than an end** — it is simply the foundational leverage to solve real-world problems in our century.',
+  'Currently venturing into the startup world by building my first business: [ShortLoad](https://getshortload.com), an on-demand marketplace for small concrete pours.',
 ];

@@ -14,10 +14,11 @@ const active = all.filter((p) => p.active);
 const other = all.filter((p) => !p.active);
 ---
 
-<Topic href="/projects" wide>
+<Topic href="/projects" wide description="I am a hands-on guy. I love to build things to learn and to add value to solve problems.">
+  <p class="part__note" style="margin-bottom: 28px;">I am a hands-on guy. I love to build things to learn and to add value to solve problems. Here are some of my projects.</p>
+
   <section class="part" id="active" aria-labelledby="active-head">
     <h2 class="part__head" id="active-head">Active projects</h2>
-    <p class="part__note">What I am building right now, at work and on the side.</p>
     <ul class="cards cards--2">
       {
         active.map((p) => (

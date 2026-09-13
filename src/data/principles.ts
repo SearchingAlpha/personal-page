@@ -1,9 +1,8 @@
 // ── How I work (the second part of /about) ───────────────────────────────────
-// Short lines, numbered on the page. Anything prefixed `TODO —` is a
-// placeholder: it is outlined on screen and listed by `npm run todo`.
+// Short lines, numbered on the page.
 
 export const principles: string[] = [
-  'TODO — how you work, in one line.',
-  'TODO — something you believe that others in your field do not.',
-  'TODO — what you refuse to do.',
+  '**The one who builds is not the one who evaluates**: build in tight loops with **independent verification**.',
+  '**Process guarantees correctness, but fragments taste**: for holistic work, **simple end-to-end vision** beats complex harnesses.',
+  '**Ship the messy middle**: never hide behind perfectionism or wait for the "ideal moment".',
 ];

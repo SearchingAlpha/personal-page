@@ -8,5 +8,5 @@ import { defineConfig } from 'astro/config';
 //   /caldera     → design3 (molten limestone)
 //   /atlantic    → design4 (midnight wireframe)
 export default defineConfig({
-  site: 'https://example.com',
+  site: 'https://pablomoral.com',
 });

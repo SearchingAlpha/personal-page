@@ -3,7 +3,7 @@ title: "Why I'm building in public"
 date: 2026-08-20
 excerpt: "For years I shipped things quietly and let them disappear. Here's why I'm doing the opposite now — posting the messy middle, not just the launch."
 tags: ["meta", "process"]
-readingTime: "5 min"
+readingTime: "< 1 min"
 ---
 
 For most of the last decade I built things quietly. A project would live on my laptop

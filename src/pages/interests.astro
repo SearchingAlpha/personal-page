@@ -12,7 +12,9 @@ const shelf = favourites();
 const filed = booksByTheme();
 ---
 
-<Topic href="/interests" description="What I read and listen to.">
+<Topic href="/interests" description="I devour content, love to read and listen to podcasts.">
+  <p class="part__note" style="margin-bottom: 28px;">I devour content, love to read and listen to podcasts.</p>
+
   <section class="part" id="books" aria-labelledby="books-head">
     <h2 class="part__head" id="books-head">Books <span class="part__count">{pad(books.length)}</span></h2>
     <p class="part__note">The {countWord(shelf.length)} I keep going back to. The whole shelf, by theme, follows.</p>
