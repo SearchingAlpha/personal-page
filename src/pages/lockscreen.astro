@@ -1,0 +1,149 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { profile } from '../data/profile';
+import { FONT_LINKS } from '../lib/letter';
+
+// QR Code URL pointing to /connect
+const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=500x500&format=png&margin=10&data=https%3A%2F%2Fpablomoral.com%2Fconnect";
+---
+
+<Layout
+  title={`Fondo de Bloqueo — ${profile.name}`}
+  description="Fondo de pantalla de bloqueo con QR de networking personal"
+  bodyClass="lockscreen-body"
+  fontLinks={FONT_LINKS}
+>
+  <div class="lockscreen-container">
+    <!-- Top safe area: Leaves space for the phone's clock, date, and widgets -->
+    <div class="clock-spacer" aria-hidden="true">
+      <span class="hint">Clock & Widgets area</span>
+    </div>
+
+    <!-- Networking Badge Zone (Middle-Lower half) -->
+    <main class="badge-card">
+      <div class="qr-box">
+        <img
+          src={qrUrl}
+          alt={`QR code for ${profile.name}`}
+          width="190"
+          height="190"
+          loading="eager"
+        />
+      </div>
+
+      <div class="info">
+        <h1 class="name">{profile.name} Moral</h1>
+        <p class="role">{profile.role}</p>
+        <p class="url">pablomoral.com/connect</p>
+      </div>
+    </main>
+
+    <!-- Bottom safe area: Leaves space for camera and flashlight lockscreen toggles -->
+    <div class="bottom-spacer" aria-hidden="true"></div>
+  </div>
+</Layout>
+
+<style>
+  :global(body.lockscreen-body) {
+    background-color: #0d1117 !important;
+    color: #f1f5f9;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100dvh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .lockscreen-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 100dvh;
+    box-sizing: border-box;
+    padding: 0 24px;
+    background: radial-gradient(circle at 50% 60%, #1a2234 0%, #0a0d14 85%);
+  }
+
+  /* Clock spacer leaves ~36% of screen height for OS Clock & Widgets */
+  .clock-spacer {
+    height: 36vh;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .clock-spacer .hint {
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.12);
+    border: 1px dashed rgba(255, 255, 255, 0.08);
+    padding: 6px 14px;
+    border-radius: 999px;
+  }
+
+  /* Badge card positioned right in the focal area below the clock */
+  .badge-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .qr-box {
+    background: #ffffff;
+    padding: 12px;
+    border-radius: 18px;
+    margin-bottom: 18px;
+    display: inline-block;
+  }
+
+  .qr-box img {
+    display: block;
+    border-radius: 8px;
+  }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .name {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    margin: 0;
+    color: #ffffff;
+  }
+
+  .role {
+    font-size: 13px;
+    color: #94a3b8;
+    margin: 0;
+    font-weight: 400;
+  }
+
+  .url {
+    font-size: 13px;
+    font-weight: 500;
+    color: #38bdf8;
+    letter-spacing: 0.3px;
+    margin: 8px 0 0 0;
+  }
+
+  /* Bottom spacer leaves ~14% for camera & flashlight toggles */
+  .bottom-spacer {
+    height: 14vh;
+    min-height: 80px;
+    width: 100%;
+  }
+</style>

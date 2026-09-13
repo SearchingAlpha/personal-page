@@ -47,12 +47,12 @@ const PREVIEW_DATABASE: Record<string, PreviewData> = {
     meta: 'The basics',
     domain: 'pablomoral.com/about',
   },
-  '/elsewhere': {
+  '/connect': {
     tag: 'Section · 05/05',
-    title: 'Elsewhere',
-    excerpt: 'Where to find me across the web: GitHub, LinkedIn, X, and direct email.',
-    meta: '4 channels',
-    domain: 'pablomoral.com/elsewhere',
+    title: 'Connect',
+    excerpt: 'Direct contact information, downloadable vCard, social channels, and exchange details.',
+    meta: 'Direct card',
+    domain: 'pablomoral.com/connect',
   },
 
   // External projects & profiles

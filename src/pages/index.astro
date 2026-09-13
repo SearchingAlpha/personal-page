@@ -28,7 +28,7 @@ const projects = sec('/projects');
 const writing = sec('/writing');
 const interests = sec('/interests');
 const about = sec('/about');
-const elsewhere = sec('/elsewhere');
+const connect = sec('/connect');
 
 const year = new Date().getFullYear();
 
@@ -70,7 +70,7 @@ const greeting = `Hi, I'm ${profile.name}`;
         and write about <a class="ref" href={writing.href} title={writing.title}>how it goes</a>.
         I'm very curious, so I keep <a class="ref" href={interests.href} title={interests.title}>consuming knowledge</a>.
         There is a bit more <a class="ref" href={about.href} title={about.title}>about me</a>,
-        and you can find me on <a class="ref" href={elsewhere.href} title={elsewhere.title}>other social media</a>.</span>
+        and you can <a class="ref" href={connect.href} title={connect.title}>reach out or connect</a>.</span>
     </p>
 
     <p class="now">
@@ -96,9 +96,10 @@ const greeting = `Hi, I'm ${profile.name}`;
 
   <footer class="foot">
     <a href={`mailto:${profile.email}`} class={todoClass(profile.email)}>{profile.email}</a>
-    <nav aria-label="Elsewhere">
+    <nav aria-label="Connect">
       {profile.socials.map((s) => <a href={s.url}>{s.label}</a>)}
       <a href={`mailto:${profile.email}`}>Email</a>
+      <a href="/connect">Connect</a>
     </nav>
   </footer>
 </Layout>

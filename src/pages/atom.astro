@@ -32,7 +32,7 @@ const facts: Record<string, { count: number; peek: string }> = {
   },
   '/writing': { count: posts.length, peek: posts[0]?.data.title ?? '' },
   '/about': { count: principles.length, peek: principles[0] ?? '' },
-  '/elsewhere': { count: profile.socials.length + 1, peek: profile.email },
+  '/connect': { count: profile.socials.length + 1, peek: profile.email },
 };
 const factsFor = (href: string) => facts[href] ?? { count: 0, peek: '' };
 const pad = (n: number) => String(n).padStart(2, '0');

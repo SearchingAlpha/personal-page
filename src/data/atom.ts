@@ -43,7 +43,7 @@ export const electrons: Electron[] = [
   { ...sectionFor('/projects'), orbit: 0, phase: 0 },
   { ...sectionFor('/writing'), orbit: 1, phase: 0 },
   { ...sectionFor('/about'), orbit: 2, phase: 0.47 },
-  { ...sectionFor('/elsewhere'), orbit: 0, phase: 0.47 },
+  { ...sectionFor('/connect'), orbit: 0, phase: 0.47 },
 ];
 
 // ── The plate ────────────────────────────────────────────────────────────────

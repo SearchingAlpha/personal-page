@@ -22,7 +22,7 @@ export const sections: Section[] = [
   { label: 'Writing', href: '/writing' },
   { label: 'Interests', href: '/interests' },
   { label: 'About me', href: '/about' },
-  { label: 'Elsewhere', href: '/elsewhere' },
+  { label: 'Connect', href: '/connect' },
 ];
 
 // Anything prefixed `TODO —` is a placeholder: outlined on screen, listed by

@@ -1,0 +1,13 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Moral Vega;Pablo;;;
+FN:Pablo Moral
+ORG:Amazon EU;Supply Chain & ML Forecasting
+TITLE:AI Engineer & Forward Deployed Engineer
+EMAIL;type=INTERNET,pref:morvegpablo@gmail.com
+URL:https://pablomoral.com
+URL;type=LinkedIn:https://www.linkedin.com/in/pablo-moral-vega-5154b9200/
+URL;type=GitHub:https://github.com/SearchingAlpha
+URL;type=X:https://x.com/0xPmoral
+NOTE:GenAI applications @ Amazon EU. Building projects in the open.
+END:VCARD
