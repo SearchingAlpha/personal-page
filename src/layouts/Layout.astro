@@ -14,6 +14,7 @@ const {
   bodyClass = '',
   fontLinks = [],
 } = Astro.props;
+const isLetter = bodyClass.includes('letter');
 ---
 
 <!doctype html>
@@ -37,6 +38,14 @@ const {
   </head>
   <body class={bodyClass}>
     <slot />
+
+    {isLetter && (
+      <script>
+        import '../styles/link-previews.css';
+        import { initLinkPreviews } from '../scripts/link-previews';
+        initLinkPreviews();
+      </script>
+    )}
   </body>
 </html>
 
