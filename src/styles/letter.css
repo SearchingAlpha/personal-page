@@ -111,9 +111,20 @@ body.letter a {
   text-transform: uppercase;
 }
 
-/* ── The sheet ─────────────────────────────────────────────────────────────── */
+/* ── The sheet & Renaissance field ────────────────────────────────────────── */
+
+.renaissance-field {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+}
 
 .top {
+  position: relative;
+  z-index: 1;
   display: flex;
   justify-content: space-between;
   align-items: baseline;
@@ -131,6 +142,8 @@ body.letter a {
 }
 
 .page {
+  position: relative;
+  z-index: 1;
   width: min(var(--measure), calc(100% - 2 * var(--gutter)));
   margin: 0 auto;
   padding: clamp(40px, 9vh, 84px) 0 48px;
@@ -138,6 +151,8 @@ body.letter a {
 }
 
 .foot {
+  position: relative;
+  z-index: 1;
   display: flex;
   justify-content: space-between;
   align-items: baseline;

@@ -54,6 +54,8 @@ const greeting = `Hi, I'm ${profile.name}`;
     } catch {}
   </script>
 
+  <canvas id="renaissance-field" class="renaissance-field" aria-hidden="true"></canvas>
+
   <header class="top">
     <a href="/">{profile.name}</a>
     <span>{profile.location} · {year}</span>
@@ -105,5 +107,13 @@ const greeting = `Hi, I'm ${profile.name}`;
 
 <script>
   import { startIntro } from '../scripts/letter-intro';
+  import { startRenaissanceField } from '../scripts/renaissance-field';
+
+  const canvas = document.querySelector<HTMLCanvasElement>('#renaissance-field');
+  const page = document.querySelector<HTMLElement>('.page');
+  if (canvas) {
+    startRenaissanceField(canvas, page);
+  }
+
   startIntro();
 </script>
