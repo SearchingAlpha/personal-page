@@ -91,6 +91,7 @@ export function startLetter(graph: Graph) {
   const go = document.querySelector<HTMLButtonElement>('.letter__go')!;
   const edges = [...document.querySelectorAll<HTMLAnchorElement>('.edge')];
   const caption = document.querySelector<HTMLElement>('.caption');
+  const art = document.querySelector<HTMLElement>('.letter__art');
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const plain = words(lead);
   // Links first, then facts; each in reading order.
@@ -160,6 +161,7 @@ export function startLetter(graph: Graph) {
   function render(t: number) {
     plain.forEach((w, k) => (w.style.opacity = String(1 - ease((t - k * DISSOLVE_STEP) / DISSOLVE_MS))));
     go.style.opacity = String(1 - ease(t / 220));
+    if (art) art.style.opacity = String(1 - ease(t / 700));
     const landed = new Map<number, number>();
     flights.forEach((f, j) => {
       const q = (t - leaves(j)) / FLY_MS;
@@ -228,6 +230,7 @@ export function startLetter(graph: Graph) {
       plain.forEach((w) => (w.style.opacity = ''));
       flying.forEach((f) => (f.style.opacity = ''));
       go.style.opacity = '';
+      if (art) art.style.opacity = '';
       graph.stage(-1, new Map());
       history.replaceState(null, '', location.pathname);
     }

@@ -1,0 +1,34 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   The night — the site's colours and faces, in one place.
+
+   Shared by the letter's pages (letter.css: the section pages, /letter,
+   /connect, the essays) and the home's graph (graph.css). After worrydream.com:
+   a deep navy sheet; pale blue for the words; white, in bold, for what can be
+   followed; yellow for what matters most and for what is still going; grey
+   for dates, counts and notes. One sans, Nunito Sans — the label register is
+   the same face, small, tracked and upper-case. No shadows, anywhere.
+
+   The names stay those of the paper design they replace (paper, ink): the
+   sheet and what is written on it.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* The sheet, and the plate a step deeper, so a plate settles into the
+     sheet rather than lifting off it. */
+  --paper: #10183a;
+  --surface: #0c1331;
+
+  /* The words, and the quieter words under them. */
+  --ink: #aaccee;
+  --ink-soft: #8fb2d4;
+  /* What can be followed: titles, links. */
+  --bright: #ffffff;
+  /* Dates, counts, notes: 6.8:1 on the sheet, clear for the 12 px labels. */
+  --muted: #9aa0ad;
+  --hair: #2c3d68;
+  /* The best, and what is live: the one accent. */
+  --accent: #ffe94d;
+
+  --text-face: 'Nunito Sans', 'Avenir Next', Avenir, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --label-face: var(--text-face);
+}

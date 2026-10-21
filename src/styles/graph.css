@@ -1,34 +1,27 @@
 /* ─────────────────────────────────────────────────────────────────────────────
    The graph — the site as one network, after the letter (src/pages/index.astro).
 
-   The letter's sheet and type, as a map of connections:
-   - Same paper, ink and one rust accent as the letter (src/styles/letter.css).
-     Rust marks what is still going — the job, ShortLoad, LLM agents, the place
-     I live — as it marks what is live on the letter. No shadows.
-   - Newsreader for names; titles of books and podcasts in italics, as titles
-     are set. Inter, small, tracked and upper-case, for the register of labels:
-     places, themes, the edges of the screen, the card's meta.
-   - Every label sits on a halo of paper, so the edges pass under it.
+   The site's night (src/styles/tokens.css), as a map of connections:
+   - The navy sheet; white for the name and what hangs off it, pale blue for
+     books and podcasts, grey for places and themes. Yellow, the one accent,
+     marks what is still going — the job, ShortLoad, LLM agents, the place I
+     live — as it marks what is live on the letter's pages. No shadows.
+   - Nunito Sans throughout; titles of books and podcasts in italics, as
+     titles are set; places and themes in the register of labels — small,
+     tracked and upper-case — like the edges of the screen and the card's meta.
+   - Every label sits on a halo of the sheet, so the edges pass under it.
    ───────────────────────────────────────────────────────────────────────────── */
 
-body.graph {
-  --paper: #fbf9f4;
-  --surface: #f5f1e8;
-  --ink: #1c1a17;
-  --ink-soft: #3d3833;
-  --muted: #726c65;
-  --hair: #e3ded4;
-  --rust: #b3401e;
+@import './tokens.css';
 
-  --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
-  --sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+body.graph {
   --dur: 220ms;
   --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
 
-  color-scheme: light;
+  color-scheme: dark;
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--serif);
+  font-family: var(--text-face);
   overflow: hidden;
 }
 
@@ -38,7 +31,7 @@ body.graph {
 .card__meta,
 .card__near-head,
 .card__actions {
-  font-family: var(--sans);
+  font-family: var(--label-face);
   font-size: 12px;
   font-weight: 500;
   line-height: 1;
@@ -67,10 +60,46 @@ body.is-moving .letter {
   display: block;
 }
 
+/* The drawings at the margins, after worrydream.com's windmill and rider:
+   pinned to the letter's column, half out into the margins, under the words. */
+.letter__art {
+  position: absolute;
+  top: clamp(40px, 9vh, 110px);
+  left: 50%;
+  width: min(600px, calc(100% - 2 * clamp(20px, 4vw, 40px)));
+  translate: -50% 0;
+  pointer-events: none;
+}
+
+.letter__art img {
+  position: absolute;
+  display: block;
+  height: auto;
+}
+
+.letter__art--ship {
+  top: -30px;
+  right: -330px;
+  width: 380px;
+}
+
+.letter__art--road {
+  top: 300px;
+  left: -360px;
+  width: 330px;
+}
+
+@media (max-width: 1100px) {
+  .letter__art {
+    display: none;
+  }
+}
+
 .letter .lead {
-  width: min(660px, calc(100% - 2 * clamp(20px, 4vw, 40px)));
+  position: relative;
+  width: min(600px, calc(100% - 2 * clamp(20px, 4vw, 40px)));
   margin: clamp(90px, 17vh, 160px) auto 0;
-  font-size: clamp(26px, 3.6vw, 34px);
+  font-size: clamp(21px, 2.7vw, 27px);
   line-height: 1.32;
   letter-spacing: -0.012em;
   text-wrap: pretty;
@@ -78,33 +107,32 @@ body.is-moving .letter {
   pointer-events: auto;
 }
 
-.letter strong {
-  font-weight: 600;
+.letter strong,
+.letter a {
+  font-weight: 700;
+  color: var(--bright);
 }
 
 .letter a {
-  color: inherit;
   text-decoration: none;
-  border-bottom: 1.5px solid var(--rust);
-  padding-bottom: 1px;
   transition: color var(--dur) var(--ease);
 }
 
 .letter a:hover {
-  color: var(--rust);
+  color: var(--accent);
 }
 
 .letter .ref::after {
   counter-increment: ref;
   content: counter(ref);
   margin-left: 3px;
-  font-family: var(--sans);
+  font-family: var(--label-face);
   font-size: 11px;
   font-weight: 500;
   line-height: 0;
   letter-spacing: 0.02em;
   vertical-align: super;
-  color: var(--rust);
+  color: var(--accent);
 }
 
 .letter__go {
@@ -115,7 +143,7 @@ body.is-moving .letter {
   padding: 8px;
   border: 0;
   background: none;
-  color: var(--rust);
+  color: var(--accent);
   cursor: pointer;
   pointer-events: auto;
 }
@@ -163,7 +191,7 @@ html.intro .lead__hi.is-typing::after {
   height: 0.9em;
   margin-left: 0.08em;
   vertical-align: -0.08em;
-  background: var(--rust);
+  background: var(--accent);
   animation: caret 1s steps(1) infinite;
 }
 
@@ -210,8 +238,7 @@ html.intro-reveal .letter__go {
 }
 
 .flier__src.is-ref {
-  border-bottom: 1.5px solid var(--rust);
-  padding-bottom: 1px;
+  font-weight: 700;
 }
 
 /* ── The sheet ─────────────────────────────────────────────────────────────── */
@@ -247,7 +274,7 @@ html.intro-reveal .letter__go {
 
 .edge:hover,
 .edge:focus-visible {
-  color: var(--rust);
+  color: var(--accent);
 }
 
 .edge--0 { top: 14px; left: 14px; }
@@ -277,11 +304,51 @@ html.intro-reveal .letter__go {
   pointer-events: none;
 }
 
+/* ── The preview: a node's picture, filling the other side of the screen ──── */
+
+.preview {
+  position: fixed;
+  z-index: 3;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  place-items: center;
+  width: 36vw;
+  padding: 6vh 3vw;
+  background: rgb(0 0 0 / 0.22);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s var(--ease);
+}
+
+.preview--left {
+  right: auto;
+  left: 0;
+}
+
+.preview.is-on {
+  opacity: 1;
+}
+
+.preview img {
+  display: block;
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+}
+
+@media (max-width: 720px) {
+  .preview {
+    display: none;
+  }
+}
+
 /* ── Links ─────────────────────────────────────────────────────────────────── */
 
 .links line {
   stroke: var(--ink);
-  stroke-opacity: 0.16;
+  stroke-opacity: 0.2;
   stroke-width: 0.8;
   transition: stroke-opacity var(--dur) var(--ease);
 }
@@ -291,7 +358,7 @@ html.intro-reveal .letter__go {
 }
 
 .net.is-hot .links line.is-near {
-  stroke-opacity: 0.6;
+  stroke-opacity: 0.7;
 }
 
 /* ── Nodes ─────────────────────────────────────────────────────────────────── */
@@ -313,7 +380,7 @@ html.intro-reveal .letter__go {
 }
 
 .node__dot {
-  fill: var(--ink);
+  fill: var(--bright);
 }
 
 .node--place .node__dot,
@@ -325,21 +392,21 @@ html.intro-reveal .letter__go {
 
 .node--book .node__dot,
 .node--podcast .node__dot {
-  fill: var(--muted);
+  fill: var(--ink);
 }
 
 .node.is-live .node__dot {
-  fill: var(--rust);
+  fill: var(--accent);
 }
 
 .node--place.is-live .node__dot {
   fill: var(--paper);
-  stroke: var(--rust);
+  stroke: var(--accent);
 }
 
 .node__pulse {
   fill: none;
-  stroke: var(--rust);
+  stroke: var(--accent);
   stroke-width: 1;
   transform-box: fill-box;
   transform-origin: center;
@@ -353,8 +420,8 @@ html.intro-reveal .letter__go {
 }
 
 .node__label {
-  font-family: var(--serif);
-  fill: var(--ink);
+  font-family: var(--text-face);
+  fill: var(--bright);
   paint-order: stroke;
   stroke: var(--paper);
   stroke-width: 5px;
@@ -373,8 +440,8 @@ html.intro-reveal .letter__go {
   font-style: italic;
 }
 
-.node--idea.is-live .node__label {
-  fill: var(--rust);
+.node.is-live .node__label {
+  fill: var(--accent);
 }
 
 .node--work .node__label,
@@ -386,12 +453,12 @@ html.intro-reveal .letter__go {
 .node--hub .node__label {
   font-size: 16px;
   font-style: italic;
-  fill: var(--ink-soft);
+  fill: var(--ink);
 }
 
 .node--place .node__label,
 .node--theme .node__label {
-  font-family: var(--sans);
+  font-family: var(--label-face);
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -404,25 +471,25 @@ html.intro-reveal .letter__go {
 
 .node--theme .node__label {
   font-size: 10.5px;
-  fill: var(--ink-soft);
+  fill: var(--muted);
 }
 
 .node--book .node__label,
 .node--podcast .node__label {
   font-size: 13.5px;
   font-style: italic;
-  fill: var(--ink-soft);
+  fill: var(--ink);
 }
 
 .node--book.is-fav .node__label {
   font-size: 14.5px;
-  fill: var(--ink);
+  fill: var(--accent);
 }
 
 .node:hover .node__label,
 .node:focus-visible .node__label,
 .node.is-open .node__label {
-  fill: var(--rust);
+  fill: var(--accent);
 }
 
 /* ── The card: a node, opened ─────────────────────────────────────────────── */
@@ -481,8 +548,8 @@ html.intro-reveal .letter__go {
 }
 
 .card__detail strong {
-  font-weight: 600;
-  color: var(--ink);
+  font-weight: 700;
+  color: var(--bright);
 }
 
 .card__near-head {
@@ -500,13 +567,13 @@ html.intro-reveal .letter__go {
 }
 
 .card__near button {
-  padding: 0 0 1px;
+  padding: 0;
   border: 0;
-  border-bottom: 1.5px solid var(--rust);
   background: none;
-  color: var(--ink);
+  color: var(--bright);
   font: inherit;
   font-size: 16px;
+  font-weight: 700;
   cursor: pointer;
   transition: color var(--dur) var(--ease);
 }
@@ -517,7 +584,7 @@ html.intro-reveal .letter__go {
 
 .card__near button:hover,
 .card__near button:focus-visible {
-  color: var(--rust);
+  color: var(--accent);
 }
 
 .card__actions {
@@ -527,7 +594,7 @@ html.intro-reveal .letter__go {
 }
 
 .card__go {
-  color: var(--rust);
+  color: var(--accent);
   text-decoration: none;
 }
 

@@ -1,11 +1,10 @@
 // Helpers for the letter design (home and section pages).
 
-// Newsreader, a text serif with optical sizes, for everything that is prose —
-// the letter itself, titles, list entries — at 400, plus 600 for the few bold
-// words inside a line. Inter, one weight up from the body, for the small
-// labels: dates, counts, the header and footer.
+// Nunito Sans for everything (src/styles/tokens.css): 400 for the words, 700
+// for what can be followed and the few words that matter most, and the
+// italics of both for titles.
 export const FONT_LINKS = [
-  'https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Inter:wght@400;500&display=swap',
+  'https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap',
 ];
 
 /** "01", "02"… — the counts as they appear in the small labels. */

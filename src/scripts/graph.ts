@@ -2,7 +2,9 @@
 // The graph is whole without this script (src/pages/index.astro lays it out at
 // build time). This makes it a place:
 // - the breath: the simulation never quite comes to rest, so the graph drifts;
-// - the neighbourhood: a node under the pointer lights up what it touches;
+// - the neighbourhood: a node under the pointer lights up what it touches,
+//   and if it has a picture (a cover, a screenshot) it fills the other side
+//   of the screen, as on worrydream.com;
 // - the hand: any node can be dragged, and the rest gives way; the sheet pans
 //   and zooms (drag the paper, wheel or pinch);
 // - the walk: a node opens its card, and the card lists what it connects to,
@@ -25,6 +27,7 @@ interface GNode {
   meta: string;
   detail: string;
   href: string;
+  image: string;
   x: number;
   y: number;
   bw: number;
@@ -302,12 +305,29 @@ export function startGraph({ bloom = true } = {}): Graph {
     els.forEach((el, j) => el.classList.toggle('is-near', i >= 0 && (j === i || near[i].has(j))));
     data.edges.forEach(([a, b], k) => lines[k].classList.toggle('is-near', i >= 0 && (a === i || b === i)));
   }
+  const preview = document.querySelector<HTMLElement>('.preview');
+  const previewImg = preview?.querySelector('img');
+  function show(i: number, x: number) {
+    if (!preview || !previewImg) return;
+    // An open card is the node's own view: no preview over or beside it.
+    const src = i >= 0 && card.hidden ? data.nodes[i].image : '';
+    preview.classList.toggle('is-on', !!src);
+    if (!src) return;
+    // On the half of the screen the pointer is not on, so it never covers what it shows.
+    preview.classList.toggle('preview--left', x > innerWidth / 2);
+    if (previewImg.getAttribute('src') !== src) previewImg.src = src;
+  }
   svg.addEventListener('pointerover', (e) => {
     if (staged || held?.moved || panning) return;
     const el = (e.target as Element).closest<SVGAElement>('.node');
-    light(el ? Number(el.dataset.i) : opened);
+    const i = el ? Number(el.dataset.i) : -1;
+    light(i >= 0 ? i : opened);
+    show(i, e.clientX);
   });
-  svg.addEventListener('pointerleave', () => light(opened));
+  svg.addEventListener('pointerleave', () => {
+    light(opened);
+    show(-1, 0);
+  });
 
   // ── The walk ──
   const meta = card.querySelector('.card__meta')!;
@@ -341,6 +361,7 @@ export function startGraph({ bloom = true } = {}): Graph {
     go.href = d.href || '/';
     go.textContent = d.href.startsWith('http') ? 'Visit' : (GO[d.href] ?? 'Open');
     card.hidden = false;
+    show(-1, 0);
   }
 
   function close() {

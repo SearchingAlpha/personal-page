@@ -29,6 +29,8 @@ export interface Node {
   href?: string;
   /** A favourite book: a step bigger. */
   favourite?: boolean;
+  /** A picture of it — a cover, a screenshot — shown beside the graph while the node is under the pointer. */
+  image?: string;
 }
 
 export type Edge = [string, string];
@@ -51,7 +53,7 @@ const nodes: Node[] = [
   { id: 'florida', label: 'Florida', kind: 'place', detail: "ShortLoad's market.", href: '/projects' },
 
   {
-    id: 'amazon', label: 'Amazon', kind: 'work', live: true, meta: 'Since 2023 · Barcelona, then Luxembourg', href: '/projects',
+    id: 'amazon', label: 'Amazon', kind: 'work', live: true, meta: 'Since 2023 · Barcelona, then Luxembourg', href: '/projects', image: amazon.image?.src,
     detail: `${plain(amazon.blurb)} ${plain(amazon.points?.[0] ?? '')}`,
   },
   {
@@ -71,7 +73,7 @@ const nodes: Node[] = [
     detail: 'Two years in the **FSUPV** team, third in the world in 2022: structures first, then **Head of Dynamics**.',
   },
 
-  { id: 'shortload', label: shortload.name, kind: 'project', live: true, meta: `${shortload.status} · ${shortload.year}`, detail: plain(shortload.blurb), href: shortload.url },
+  { id: 'shortload', label: shortload.name, kind: 'project', live: true, meta: `${shortload.status} · ${shortload.year}`, detail: plain(shortload.blurb), href: shortload.url, image: shortload.image?.src },
   { id: 'polymarket', label: 'Polymarket intel', kind: 'project', meta: `${polymarket.status} · ${polymarket.year}`, detail: plain(polymarket.blurb), href: polymarket.url },
 
   { id: 'supply-chain', label: 'supply chain', kind: 'idea', href: '/projects' },
@@ -88,7 +90,7 @@ const nodes: Node[] = [
   })),
   ...books.map((b) => ({
     id: `book-${slug(b.title)}`, label: b.title, kind: 'book' as const, meta: b.author, href: '/interests#books',
-    favourite: b.favourite, detail: `${b.blurb ?? ''}${b.favourite ? ' One of my favourites.' : ''}`.trim(),
+    favourite: b.favourite, image: b.cover, detail: `${b.blurb ?? ''}${b.favourite ? ' One of my favourites.' : ''}`.trim(),
   })),
   ...podcasts.map((p) => ({ id: `podcast-${slug(p.name)}`, label: p.name, kind: 'podcast' as const, meta: p.by, href: p.spotify, detail: p.blurb })),
 ];

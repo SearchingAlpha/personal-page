@@ -51,7 +51,7 @@ const data = {
   sheet,
   nodes: nodes.map((n, i) => ({
     id: n.id, label: n.label, kind: n.kind, live: !!n.live, favourite: !!n.favourite,
-    kindLabel: KIND[n.kind], meta: n.meta ?? '', detail: bold(n.detail ?? ''), href: n.href ?? '',
+    kindLabel: KIND[n.kind], meta: n.meta ?? '', detail: bold(n.detail ?? ''), href: n.href ?? '', image: n.image ?? '',
     x: r1(b[i].x), y: r1(b[i].y), bw: r1(b[i].bw), bh: r1(b[i].bh),
   })),
   edges: edges.map(([a, c]) => [at.get(a)!, at.get(c)!]),
@@ -85,6 +85,12 @@ const groups = ['work', 'study', 'project', 'place', 'idea', 'theme', 'book', 'p
   </script>
 
   <section class="letter" aria-label="The letter">
+    <!-- Two drawings at the margins, ink on the night: a ship off to the right,
+         the road forking at the left. They go when the letter becomes the graph. -->
+    <div class="letter__art" aria-hidden="true">
+      <img class="letter__art--ship" src="/illustrations/ship.webp" alt="" width="380" height="570" />
+      <img class="letter__art--road" src="/illustrations/crossroads.webp" alt="" width="330" height="495" />
+    </div>
     <!-- .lead__hi is what the intro types (letter-intro.ts), the name inside it
          what flies to the centre; keep the two spans adjacent, so no space
          slips between them. Every link is class="ref": the numbers come from
@@ -140,6 +146,9 @@ const groups = ['work', 'study', 'project', 'place', 'idea', 'theme', 'book', 'p
         </g>
       </g>
     </svg>
+
+    <!-- A node's picture, beside the graph while the node is under the pointer (graph.ts). -->
+    <div class="preview" aria-hidden="true"><img alt="" /></div>
 
     <p class="caption" aria-hidden="true">Everything on this site, and how it connects. Drag anything; open anything.</p>
 

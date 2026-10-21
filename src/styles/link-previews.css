@@ -4,10 +4,9 @@
   position: fixed;
   z-index: 1000;
   pointer-events: none;
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--hair, #e3ded4);
   border-radius: 4px;
-  box-shadow: 0 14px 34px -8px rgba(28, 26, 23, 0.12), 0 4px 12px -2px rgba(28, 26, 23, 0.06);
   width: 330px;
   max-width: calc(100vw - 32px);
   padding: 16px 18px 14px;
@@ -28,17 +27,17 @@
 
 .preview-tag {
   display: inline-block;
-  font-family: var(--sans, 'Inter', sans-serif);
+  font-family: var(--label-face, 'Inter', sans-serif);
   font-size: 10.5px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--rust, #b3401e);
+  color: var(--accent, #b3401e);
   margin-bottom: 5px;
 }
 
 .preview-title {
-  font-family: var(--serif, 'Newsreader', Georgia, serif);
+  font-family: var(--text-face, 'Newsreader', Georgia, serif);
   font-size: 19px;
   line-height: 1.25;
   color: var(--ink, #1c1a17);
@@ -56,7 +55,7 @@
 }
 
 .preview-excerpt {
-  font-family: var(--serif, 'Newsreader', Georgia, serif);
+  font-family: var(--text-face, 'Newsreader', Georgia, serif);
   font-size: 14.5px;
   line-height: 1.45;
   color: var(--ink-soft, #3d3833);
@@ -69,7 +68,7 @@
   justify-content: space-between;
   padding-top: 8px;
   border-top: 1px solid var(--hair, #e3ded4);
-  font-family: var(--sans, 'Inter', sans-serif);
+  font-family: var(--label-face, 'Inter', sans-serif);
   font-size: 11px;
   color: var(--muted, #726c65);
 }

@@ -20,20 +20,21 @@ Lo que hace que este sitio sea este sitio, escrito para no reabrirlo cada vez. S
 
 ## Tipografía
 
-- **Una serif de texto, Newsreader.** Los títulos nunca en negrita: la jerarquía la llevan el tamaño y la cursiva. **La negrita (600) es para resaltar**, dentro de una línea, las pocas palabras que importan —una cifra, un nombre, la idea— y nunca más de dos o tres por frase. En los datos se escribe `**así**`.
-- **Un registro de etiquetas:** Inter 500, 12 px, tracking 0.08em, mayúsculas. Solo para lo que no es prosa: fechas, cabecera, pie, temáticas, cuentas.
-- Los ordinales de las referencias van en Inter 500 a 11 px, en el acento.
+- **Una sola sans, Nunito Sans** (octubre de 2026, a la manera de [worrydream.com](https://worrydream.com/), que usa Avenir; Nunito Sans es la libre más cercana). Los títulos nunca en negrita: la jerarquía la lleva el tamaño. **La negrita (700) es para lo que se puede seguir** —los enlaces, en blanco— **y para resaltar**, dentro de una línea, las pocas palabras que importan, nunca más de dos o tres por frase. En los datos se escribe `**así**`.
+- **Un registro de etiquetas:** la misma sans, 12 px, tracking 0.08em, mayúsculas. Solo para lo que no es prosa: fechas, cabecera, pie, temáticas, cuentas.
+- Los ordinales de las referencias van a 11 px, en el acento.
 
 ## Color
 
-- **Papel cálido, tinta casi negra, un solo acento óxido.** El acento marca lo que se puede seguir (subrayados de la carta, ordinales) y lo que está vivo (*Growing*, *Building*, *favourite*). No decora.
-- Todo el color está en `:root` al principio de `src/styles/letter.css`.
+- **La noche, a la manera de worrydream.com** (octubre de 2026; antes, papel cálido con tinta y óxido): **la hoja azul marino** (`#10183a`), **las palabras en azul pálido** (`#aaccee`), **en blanco y negrita lo que se puede seguir**, **en gris** fechas, cuentas y notas, y **un solo acento, amarillo** (`#ffe94d`), para los ordinales de las referencias, lo mejor (los libros favoritos) y lo que está vivo (*Growing*, *Building*, el trabajo de ahora). No decora.
+- **Su estilo, mi material.** Ni sus dibujos ni su tipo: los dibujos de los márgenes son los míos, entintados a pluma, y la tipografía es libre.
+- Todo el color y el tipo están en un solo sitio, `src/styles/tokens.css`, que leen las páginas de la carta y el grafo.
 
 ## Superficies — la placa
 
-- **Dos escalones de papel, y solo dos.** La hoja es el claro (`--paper: #fbf9f4`) y **la placa es un escalón más profundo** (`--surface: #f5f1e8`): una placa se asienta en la página, no se levanta sobre ella. Probado al revés en septiembre de 2026 —hoja `#ece5d6`, placa `#fdfbf7`— y las placas pasaban a leerse como hojas sobre una mesa: **no es lo que este sitio quiere.** El papel profundo además baja `--muted` a 3,8:1, por debajo de AA para las etiquetas de 12 px, así que una inversión obliga a oscurecerlo también.
+- **Dos escalones de noche, y solo dos.** La hoja (`--paper: #10183a`) y **la placa un escalón más profunda** (`--surface: #0c1331`): una placa se asienta en la página, no se levanta sobre ella. (Con el papel se probó al revés en septiembre de 2026 y las placas pasaban a leerse como hojas sobre una mesa; la regla se queda.)
 - **Un solo rectángulo, repetido.** En una página de sección, todo bloque de contenido se dibuja igual: borde hairline de un píxel, esquina de 2 px, el escalón profundo de papel y un único padding. Vale para la nota bajo el nombre de una sección, cada tarjeta de una cuadrícula, la estantería, una lista archivada, la hoja de datos y cada principio. Modelo: [gulipad.com](https://www.gulipad.com/).
-- **Los chips vuelven al papel de la hoja** (`.pill`, las etiquetas de una tarjeta): sobre la placa se leen como marcas encima, no como agujeros.
+- **Los chips vuelven al color de la hoja** (`.pill`, las etiquetas de una tarjeta): sobre la placa se leen como marcas encima, no como agujeros.
 - **La consistencia es que solo hay una regla.** La lista de selectores de la placa está en un sitio (`src/styles/letter.css`, "The plate"). Un bloque nuevo se añade a esa lista; **nunca se escribe una segunda caja.**
 - **La carta no lleva placas.** La portada es prosa desnuda sobre la hoja: una carta no tiene paneles.
 - **Las secciones se distinguen por una regla, no por una caja más pesada.** El nombre de la sección y, desde él hasta el margen derecho, un filete de un píxel (`.part__head`). Un peso de caja, un peso de línea. Un nivel por debajo —una temática en `/interests`— la etiqueta va sola: la placa de abajo es la que cierra el grupo.
@@ -59,7 +60,9 @@ Lo que hace que este sitio sea este sitio, escrito para no reabrirlo cada vez. S
 - **Un sitio, no una página.** Tras la carta, la portada es todo el sitio como una red con el nombre en el centro: trabajo, estudios, proyectos, lugares, libros y podcasts. Se recorre, no se lee de arriba abajo.
 - **Las ideas son los cruces.** Unas pocas ideas (*supply chain*, *LLM agents*, *markets*, *engineering*) están donde se tocan lo que hago y lo que leo: *The Box* lleva a *supply chain*, y *supply chain* a Amazon, Mango y Kubota. Sin esos cruces sería una lista.
 - **Cada palabra de la carta tiene adónde ir.** Los hechos vuelan a sus nodos; los enlaces, a la palabra de su sección en el borde de la pantalla —las referencias de la carta se convierten en el marco del sitio—; lo demás se disuelve. Nada desaparece sin destino.
-- **El mismo papel, la misma tinta, el mismo acento.** El óxido marca lo que sigue vivo (Amazon, ShortLoad, *LLM agents*, Luxemburgo), como en la carta. Los títulos de libros y podcasts en cursiva, como se escriben los títulos; lugares y temáticas en el registro de etiquetas. Cada etiqueta lleva un halo de papel para que las aristas pasen por debajo.
+- **La misma noche, el mismo acento.** En blanco el nombre y lo que cuelga de él, en azul pálido libros y podcasts, en gris lugares y temáticas; el amarillo marca lo que sigue vivo (Amazon, ShortLoad, *LLM agents*, Luxemburgo) y lo mejor (los libros favoritos). Los títulos de libros y podcasts en cursiva, como se escriben los títulos; lugares y temáticas en el registro de etiquetas. Cada etiqueta lleva un halo de la hoja para que las aristas pasen por debajo.
+- **Las imágenes, a la derecha** (o a la izquierda: en la mitad de la pantalla donde no está el puntero), como en worrydream.com: un nodo con imagen —una portada, una captura— la muestra a toda altura mientras está bajo el puntero.
+- **Dos dibujos en los márgenes de la carta**, tinta sobre la noche: un barco a la derecha y la bifurcación del camino a la izquierda, a medias fuera de la columna y por debajo de las palabras. Se van cuando la carta se convierte en el grafo.
 - **Ninguna etiqueta pisa a otra.** Cada etiqueta es una caja en la simulación, y la maqueta se elige en el build entre varias semillas por el menor número de aristas cruzadas. Un grafo vale lo que se leen sus etiquetas.
 - **Vivo, pero quieto para leer.** Respira sin moverse de sitio; reacciona al puntero (el vecindario se ilumina, lo demás se aparta), se arrastra y se amplía. Cada nodo abre una tarjeta —la placa— con sus palabras y con qué conecta, y desde ella se sigue al siguiente.
 - **Los bordes son la navegación.** Las seis palabras de los bordes —la carta y las cinco secciones— son el único chrome; no hay cabecera ni pie.
