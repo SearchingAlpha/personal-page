@@ -77,6 +77,7 @@ Los borradores siguen accesibles, cada uno en su ruta, con su hoja de estilos en
 | Ruta | Nombre | Dirección visual |
 |---|---|---|
 | `/drafts` | — | Índice comparador |
+| `/graph` | Grafo | Abre en la carta, y la carta se convierte en el grafo: los enlaces vuelan a los bordes de la pantalla, los hechos a sus nodos, y el resto crece desde donde aterrizan. Todo el sitio como una red viva con el nombre en el centro (`/graph#graph` abre directamente en el grafo) |
 | `/atom` | Rutherford | Lámina de laboratorio: el nombre como núcleo, cada sección un electrón en órbita, un autómata celular detrás |
 | `/aaru` | Aaru | Observatorio oscuro. Negro, azul eléctrico, lima ácido, tipografía ultraligera |
 | `/pravah` | Pravah | Dossier en pergamino cálido, una inversión en berenjena |

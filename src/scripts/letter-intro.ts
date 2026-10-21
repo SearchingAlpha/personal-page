@@ -8,6 +8,10 @@
 // visit in the same session, skips it altogether (see the inline script in
 // index.astro, which decides that before the first paint so nothing flashes).
 // To watch it again, open /#intro.
+//
+// It types into the greeting's own text nodes rather than rewriting its text,
+// so whatever markup the greeting holds is still there when it is whole: on
+// /graph the name inside it is a span that later flies to the graph.
 
 const TYPE_MS = 70; // per character typed
 const HOLD_MS = 550; // after typing, before the reveal
@@ -20,7 +24,20 @@ export function startIntro() {
   const hi = document.querySelector<HTMLElement>('.lead__hi');
   if (!root.classList.contains('intro') || !hi) return;
 
-  const text = hi.dataset.text ?? hi.textContent ?? '';
+  // Each text node of the greeting and its words; typing shows the first `count` characters across them.
+  const texts: { node: Text; full: string }[] = [];
+  for (const walker = document.createTreeWalker(hi, NodeFilter.SHOW_TEXT); walker.nextNode(); ) {
+    texts.push({ node: walker.currentNode as Text, full: (walker.currentNode as Text).data });
+  }
+  const total = texts.reduce((n, t) => n + t.full.length, 0);
+  const show = (count: number) => {
+    let left = count;
+    for (const t of texts) {
+      const k = Math.max(0, Math.min(t.full.length, left));
+      t.node.data = t.full.slice(0, k);
+      left -= k;
+    }
+  };
   let done = false;
 
   const timers: ReturnType<typeof setTimeout>[] = [];
@@ -32,7 +49,7 @@ export function startIntro() {
     for (const t of timers) clearTimeout(t);
     removeEventListener('pointerdown', skip);
     removeEventListener('keydown', skip);
-    hi.textContent = text;
+    show(total);
     hi.classList.add('is-typed');
     try {
       sessionStorage.setItem(KEY, '1');
@@ -49,11 +66,11 @@ export function startIntro() {
   addEventListener('keydown', skip);
 
   // Empty the greeting, show the caret, type; hold; reveal.
-  hi.textContent = '';
+  show(0);
   hi.classList.add('is-typing');
   let ms = 350;
-  for (let i = 1; i <= text.length; i++) {
-    later(ms, () => (hi.textContent = text.slice(0, i)));
+  for (let i = 1; i <= total; i++) {
+    later(ms, () => show(i));
     ms += TYPE_MS * (0.7 + Math.random() * 0.6);
   }
   later(ms + HOLD_MS, () => finish(false));
