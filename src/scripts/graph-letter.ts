@@ -12,7 +12,7 @@
 // swaps one for the other at once. While the greeting is still being typed
 // (letter-intro.ts), moving on waits for it.
 //
-// What goes where is in the markup (graph.astro): data-to="node:<id>" or
+// What goes where is in the markup (index.astro): data-to="node:<id>" or
 // data-to="edge:<href>" on the words that fly.
 import type { Graph } from './graph';
 

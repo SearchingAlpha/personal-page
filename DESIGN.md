@@ -4,7 +4,7 @@ Lo que hace que este sitio sea este sitio, escrito para no reabrirlo cada vez. S
 
 ## La carta
 
-- La portada es **una carta corta en primera persona**, no una portada de portfolio. Un párrafo; debajo, la línea *now* con la fecha en que era cierta; después, lo más reciente.
+- La portada es **una carta corta en primera persona**, no una portada de portfolio, **que se convierte en el grafo** cuando el lector sigue (abajo, "El grafo"). Un párrafo; debajo, la línea *now* con la fecha en que era cierta; después, lo más reciente.
 - **Las secciones se enlazan desde dentro de las frases**, no desde un menú. La carta es la navegación.
 - **Sin cifras en el titular.** Los números que lleva la carta son referencias (abajo), no cuentas. Las cuentas van en las páginas, y en palabras.
 - La primera vez que se abre, el saludo se escribe letra a letra y el resto aparece alrededor. La página está completa sin JavaScript.
@@ -53,3 +53,13 @@ Lo que hace que este sitio sea este sitio, escrito para no reabrirlo cada vez. S
 - **Las cuentas se escriben en palabras** hasta noventa y nueve ("twenty-three books", "the five I keep going back to").
 - **Lo que está vivo lleva fecha.** La línea *now* dice cuándo era cierta.
 - **Los placeholders se ven.** Cualquier texto que empiece por `TODO —` sale con un contorno ámbar para que no se publique por accidente.
+
+## El grafo — la carta se convierte en él
+
+- **Un sitio, no una página.** Tras la carta, la portada es todo el sitio como una red con el nombre en el centro: trabajo, estudios, proyectos, lugares, libros y podcasts. Se recorre, no se lee de arriba abajo.
+- **Las ideas son los cruces.** Unas pocas ideas (*supply chain*, *LLM agents*, *markets*, *engineering*) están donde se tocan lo que hago y lo que leo: *The Box* lleva a *supply chain*, y *supply chain* a Amazon, Mango y Kubota. Sin esos cruces sería una lista.
+- **Cada palabra de la carta tiene adónde ir.** Los hechos vuelan a sus nodos; los enlaces, a la palabra de su sección en el borde de la pantalla —las referencias de la carta se convierten en el marco del sitio—; lo demás se disuelve. Nada desaparece sin destino.
+- **El mismo papel, la misma tinta, el mismo acento.** El óxido marca lo que sigue vivo (Amazon, ShortLoad, *LLM agents*, Luxemburgo), como en la carta. Los títulos de libros y podcasts en cursiva, como se escriben los títulos; lugares y temáticas en el registro de etiquetas. Cada etiqueta lleva un halo de papel para que las aristas pasen por debajo.
+- **Ninguna etiqueta pisa a otra.** Cada etiqueta es una caja en la simulación, y la maqueta se elige en el build entre varias semillas por el menor número de aristas cruzadas. Un grafo vale lo que se leen sus etiquetas.
+- **Vivo, pero quieto para leer.** Respira sin moverse de sitio; reacciona al puntero (el vecindario se ilumina, lo demás se aparta), se arrastra y se amplía. Cada nodo abre una tarjeta —la placa— con sus palabras y con qué conecta, y desde ella se sigue al siguiente.
+- **Los bordes son la navegación.** Las seis palabras de los bordes —la carta y las cinco secciones— son el único chrome; no hay cabecera ni pie.

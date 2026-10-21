@@ -1,4 +1,4 @@
-// ── The graph (draft, at /graph) ─────────────────────────────────────────────
+// ── The graph (the home page, after the letter) ──────────────────────────────
 // Everything on the site as one network, with the name at its centre: where I
 // worked and studied, what I am building, the places, and what I read and
 // listen to. A few ideas sit between them — the day job and the shelf meet at
@@ -7,7 +7,7 @@
 //
 // Books, podcasts, themes and projects come from the other data files; this
 // file adds what they do not hold: the places, the jobs and studies (from the
-// CV, worded as on /about), the ideas, and the edges between them all.
+// CV), the ideas, and the edges between them all.
 import { profile } from './profile';
 import { projects } from './projects';
 import { books, podcasts, themes } from './interests';

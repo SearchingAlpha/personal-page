@@ -11,7 +11,7 @@
 //
 // It types into the greeting's own text nodes rather than rewriting its text,
 // so whatever markup the greeting holds is still there when it is whole: on
-// /graph the name inside it is a span that later flies to the graph.
+// the home page the name inside it is a span that later flies to the graph.
 
 const TYPE_MS = 70; // per character typed
 const HOLD_MS = 550; // after typing, before the reveal

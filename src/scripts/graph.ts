@@ -1,5 +1,5 @@
 // ── The graph, alive ─────────────────────────────────────────────────────────
-// The graph is whole without this script (src/pages/graph.astro lays it out at
+// The graph is whole without this script (src/pages/index.astro lays it out at
 // build time). This makes it a place:
 // - the breath: the simulation never quite comes to rest, so the graph drifts;
 // - the neighbourhood: a node under the pointer lights up what it touches;
@@ -9,7 +9,7 @@
 //   each a step to the next card.
 // It can also be held still and staged — shown as so far grown out of a few
 // nodes — which is how the letter turns into it (src/scripts/graph-letter.ts),
-// and how it blooms out of the name when opened on its own (/graph#graph).
+// and how it blooms out of the name when opened on its own (/#graph).
 // On a sheet taller than it is wide, the graph is laid out again to fit.
 // Reduced motion keeps the hand and the walk, and drops the breath.
 import { bodies, springs, step, settleBest, type Body, type Sheet } from '../lib/graph-sim';
@@ -325,7 +325,7 @@ export function startGraph({ bloom = true } = {}): Graph {
     meta.textContent = [d.kindLabel, d.meta].filter(Boolean).join(' · ');
     title.textContent = d.label;
     title.classList.toggle('is-title', TITLED.includes(d.kind));
-    detail.innerHTML = d.detail; // the site's own words, escaped at build (graph.astro)
+    detail.innerHTML = d.detail; // the site's own words, escaped at build (index.astro)
     detail.hidden = !d.detail;
     list.innerHTML = '';
     for (const j of [...near[i]].sort((a, b) => ORDER.indexOf(data.nodes[a].kind) - ORDER.indexOf(data.nodes[b].kind))) {
