@@ -1,7 +1,3 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
-  <rect width="32" height="32" rx="6" fill="#1c1a17"/>
-  <!-- Elegant serif 'P' -->
-  <text x="7" y="24" font-family="'Newsreader', 'Georgia', serif" font-size="22" font-style="normal" font-weight="500" fill="#fbf9f4">P</text>
-  <!-- Accent reference ordinal superscript -->
-  <circle cx="23" cy="10" r="2.5" fill="#b3401e"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" fill="#10183a" />
 </svg>
